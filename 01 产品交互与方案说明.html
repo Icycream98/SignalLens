@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<!-- saved from url=(0049)http://localhost:8899/01_product_interaction.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SignalLens · AI 投研助手 — 产品交互方案（01/03）</title>
+<style>
+  :root{
+    --ink:#17233d; --muted:#5b6b84; --faint:#8a97ad;
+    --line:#e2e9f5; --line-soft:#edf2fa;
+    --page:#f4f7fc; --card:#ffffff;
+    --blue:#2563eb; --blue-d:#1e40af; --navy:#0b1f45; --navy2:#173a8a;
+    --sky:#eaf2ff; --skyline:#c7d9fb;
+    --amber:#b45309; --amber-bg:#fff6e3; --amber-line:#f3cf7d;
+    --green:#15803d; --green-bg:#ecfdf3; --green-line:#bbe7cd;
+    --slate-chip:#5b6b84;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--page); line-height:1.6;
+    font-size:14px; letter-spacing:.01em;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,p{margin:0;}
+  ul{margin:0;padding:0;list-style:none;}
+  a{color:inherit;text-decoration:none;}
+  .shell{max-width:1180px;margin:0 auto;padding:0 24px;}
+
+  /* ============ 顶部导航 ============ */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    background:rgba(11,31,69,.96);color:#fff;
+    backdrop-filter:blur(6px);
+  }
+  .topbar-in{max-width:1180px;margin:0 auto;padding:0 24px;height:54px;display:flex;align-items:center;gap:20px;}
+  .brand{display:flex;align-items:center;gap:9px;white-space:nowrap;flex:none;}
+  .dot{width:14px;height:14px;border-radius:50%;flex:none;
+       background:conic-gradient(#38bdf8,#2563eb,#38bdf8);box-shadow:0 0 10px rgba(56,189,248,.9);}
+  .brand b{font-size:15px;letter-spacing:.02em;}
+  .brand span{font-size:11px;opacity:.72;margin-left:2px;}
+  .nav{margin-left:auto;display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;}
+  .nav::-webkit-scrollbar{display:none;}
+  .nav a{white-space:nowrap;font-size:12px;color:#cfdcf4;padding:6px 9px;border-radius:8px;line-height:1;}
+  .nav a:hover{background:rgba(255,255,255,.12);color:#fff;}
+  .nav a i{font-style:normal;color:#7ea3f5;margin-right:4px;font-weight:700;}
+
+  /* ============ Hero ============ */
+  .hero{background:linear-gradient(150deg,#0b1f45 0%,#12306e 58%,#1d4ed8 120%);color:#fff;border-radius:0 0 26px 26px;}
+  .hero-in{max-width:1180px;margin:0 auto;padding:40px 24px 34px;
+           display:grid;grid-template-columns:1.04fr .96fr;gap:30px;align-items:center;}
+  .h-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#bcd2fb;
+           border:1px solid rgba(122,166,255,.45);padding:4px 11px;border-radius:999px;background:rgba(29,78,216,.22);}
+  .h-badge em{font-style:normal;font-weight:700;color:#fff;}
+  .h1wrap{margin:16px 0 6px;}
+  .h1wrap h1{font-size:40px;line-height:1.18;letter-spacing:.01em;font-weight:800;}
+  .h1wrap h1 span{color:#8ec5ff;}
+  .lead{margin-top:10px;font-size:17px;color:#dbe7ff;max-width:600px;font-weight:500;}
+  .lead b{color:#fff;}
+  .lead .chips-inline{color:#8ec5ff;font-weight:600;white-space:nowrap;}
+  .principle{
+    margin-top:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    background:rgba(255,255,255,.08);border:1px solid rgba(122,166,255,.55);
+    padding:13px 18px;border-radius:14px;backdrop-filter:blur(2px);
+  }
+  .principle .tag{flex:none;font-size:11px;font-weight:800;letter-spacing:.12em;color:#93c5fd;background:rgba(37,99,235,.35);
+                  padding:4px 9px;border-radius:6px;}
+  .principle p{font-size:17px;font-weight:700;letter-spacing:.02em;}
+  .principle p small{display:block;font-size:11.5px;color:#b9cdf5;font-weight:500;letter-spacing:.04em;margin-top:2px;}
+  .h-meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:7px;}
+  .h-meta .mk{font-size:11.5px;color:#c6d8fa;border:1px solid rgba(122,166,255,.4);border-radius:999px;padding:3px 10px;background:rgba(13,40,100,.35);}
+  .h-meta .mk i{font-style:normal;color:#8ec5ff;margin-right:4px;font-weight:700;}
+
+  /* Hero 右侧：3 秒看懂 */
+  .pipe{background:#fff;color:var(--ink);border-radius:18px;padding:18px 18px 14px;
+        box-shadow:0 18px 44px rgba(5,16,44,.35);}
+  .pipe-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  .pipe-head b{font-size:13.5px;}
+  .pipe-head span{font-size:10.5px;color:var(--faint);letter-spacing:.08em;}
+  .row{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px;}
+  .row .rt{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+  .rt .ic{flex:none;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+          font-size:11px;font-weight:800;color:#fff;}
+  .ic.i1{background:#94a3b8;} .ic.i2{background:var(--blue);} .ic.i3{background:var(--navy2);}
+  .rt b{font-size:12.5px;}
+  .row .qa{font-size:12px;color:var(--muted);}
+  .row .qa b{color:var(--ink);font-weight:600;}
+  .chip{display:inline-block;font-size:10.5px;border:1px solid var(--skyline);background:var(--sky);color:var(--blue-d);
+        border-radius:999px;padding:1px 8px;margin:1px 2px 0 0;}
+  .arrline{text-align:center;color:#7ea3f5;font-size:13px;line-height:1;margin-top:8px;letter-spacing:2px;}
+  .nozone{margin-top:10px;border:1px dashed #dfe7f4;border-radius:10px;padding:7px 12px;font-size:11.5px;color:var(--slate-chip);background:#fafcff;}
+  .nozone b{color:#4b5563;margin-right:6px;}
+  .nozone s{color:#c04a3c;text-decoration-color:#c04a3c;text-decoration-thickness:1.5px;margin:0 6px 0 0;font-weight:600;}
+
+  /* ============ 区块通用 ============ */
+  .sec{padding:34px 0 4px;scroll-margin-top:70px;}
+  .sh{display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;}
+  .sh .num{flex:none;font-size:13px;font-weight:800;color:#fff;background:linear-gradient(135deg,#2563eb,#1e40af);
+           width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-top:2px;box-shadow:0 3px 8px rgba(37,99,235,.25);}
+  .sh h2{font-size:21px;font-weight:800;letter-spacing:.01em;}
+  .sh p{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .kicker{margin:2px 0 14px 42px;font-size:13px;color:var(--faint);max-width:920px;}
+  .kicker b{color:var(--blue-d);font-weight:700;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;}
+  .ct{display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+  .ct h3{font-size:15px;font-weight:800;}
+  .pill{font-size:10.5px;font-weight:800;letter-spacing:.08em;border-radius:999px;padding:2px 8px;display:inline-flex;align-items:center;gap:4px;}
+  .pill.blue{background:var(--sky);color:var(--blue-d);border:1px solid var(--skyline);}
+  .pill.green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-line);}
+  .pill.gray{background:#f1f4f9;color:var(--slate-chip);border:1px solid #e2e8f0;}
+  .pill.amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line);}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(228px,1fr));gap:12px;}
+  ul.li li{position:relative;padding-left:20px;margin:5px 0;font-size:13.5px;color:#2a3a55;}
+  ul.li li::before{content:"";position:absolute;left:2px;top:9px;width:6px;height:6px;border-radius:50%;background:var(--blue);opacity:.75;}
+  ul.li li b{color:var(--ink);}
+  ul.li li small{color:var(--faint);font-size:11.5px;display:block;margin-top:1px;}
+
+  /* 大字结论 */
+  .stmt{border:1px solid var(--line);border-radius:16px;padding:20px 24px;background:var(--card);}
+  .stmt .lab{font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--blue);margin-bottom:7px;}
+  .stmt .big{font-size:20px;font-weight:800;line-height:1.55;color:var(--ink);}
+  .stmt .big .hl{color:var(--blue-d);}
+  .stmt .big .hlb{background:linear-gradient(120deg,rgba(37,99,235,.14),rgba(37,99,235,.05));padding:0 3px;border-radius:4px;}
+  .stmt .subline{font-size:13px;color:var(--muted);margin-top:10px;max-width:1000px;}
+  .stmt .subline b{color:var(--ink);}
+  .stmt .subline .ko{color:#b42318;font-weight:700;}
+
+  /* ============ 01 ============ */
+  .upro{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 10px;}
+  .upro .p{font-size:11.5px;background:var(--sky);border:1px solid var(--skyline);color:var(--blue-d);border-radius:999px;padding:2px 10px;}
+  .qr{display:flex;flex-direction:column;gap:8px;}
+  .qr .q{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 13px;}
+  .qr .q .qi{flex:none;font-size:11.5px;font-weight:800;color:var(--blue-d);background:var(--sky);border:1px solid var(--skyline);
+             width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+  .qr .q b{font-size:13.5px;display:block;}
+  .qr .q span{font-size:12px;color:var(--muted);}
+  .trig{display:flex;gap:7px;flex-wrap:wrap;margin:2px 0 12px;}
+  .trig .t{font-size:12px;border:1px solid #f3cf7d;background:var(--amber-bg);color:var(--amber);border-radius:999px;padding:2px 11px;font-weight:600;}
+
+  /* ============ 02 ============ */
+  .pain-cards .card{border-top:3px solid #dbe4f3;}
+  .pain-cards .card h3{font-size:14.5px;margin-bottom:4px;}
+  .pain-cards .card p{font-size:12.5px;color:var(--muted);}
+  .pain-out{margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .out-arrow{grid-column:1/-1;text-align:center;color:var(--faint);font-size:12px;letter-spacing:3px;}
+  .po{border-radius:11px;padding:10px 14px;font-size:13px;font-weight:600;border:1px solid;}
+  .po.a{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber);}
+  .po.b{background:#fdf0ee;border-color:#f2c6bf;color:#b42318;}
+  .po b{display:block;font-size:10.5px;letter-spacing:.1em;opacity:.75;margin-bottom:2px;font-weight:800;}
+
+  /* ============ 03 ============ */
+  .chain{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 4px;align-items:stretch;}
+  .cnk{flex:1 1 210px;min-width:0;background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 14px;text-align:left;}
+  .cnk .en{font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--blue);margin-bottom:3px;}
+  .cnk .zh{font-size:16px;font-weight:800;margin-bottom:4px;}
+  .cnk p{font-size:12px;color:var(--muted);}
+  .cnk .shade{font-size:10.5px;color:var(--faint);margin-top:6px;}
+  .carr{flex:0 0 24px;display:flex;align-items:center;justify-content:center;color:var(--blue);font-weight:800;font-size:16px;}
+  .role-strip{margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:#2a3a55;background:var(--sky);
+              border:1px solid var(--skyline);border-radius:12px;padding:11px 16px;}
+  .role-strip b{color:var(--blue-d);}
+
+  /* ============ 04 ============ */
+  .s4band{background:linear-gradient(180deg,#e6effd 0%,#f5f9ff 100%);border-radius:22px;margin-top:6px;}
+  .s4band>.shell{padding-top:26px;padding-bottom:28px;}
+  .flow-meta{margin:-4px 0 12px 42px;display:flex;flex-wrap:wrap;gap:7px;align-items:center;}
+  .fchip{font-size:11.5px;color:#31466f;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 11px;}
+  .fchip i{font-style:normal;font-weight:800;margin-right:5px;}
+  .fchip.auto{border-color:var(--skyline);background:var(--sky);color:var(--blue-d);}
+  .fchip.order{border-color:#b9c8ea;background:#eef3fc;color:#2b4d8f;}
+  .fchip.hitl{border-color:var(--amber-line);background:var(--amber-bg);color:var(--amber);}
+
+  /* 7 步主链路 */
+  .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  .fs{position:relative;background:#fff;border:1px solid var(--line);border-top:3px solid var(--blue);border-radius:11px;
+      padding:9px 10px 10px;display:flex;flex-direction:column;}
+  .fs .top{position:static;background:none;color:inherit;display:flex;align-items:center;gap:6px;margin-bottom:5px;backdrop-filter:none;}
+  .fs .ix{flex:none;width:22px;height:22px;border-radius:7px;background:var(--sky);color:var(--blue-d);border:1px solid var(--skyline);
+          font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .fs .t{font-size:13px;font-weight:800;line-height:1.3;}
+  .fs .en{font-size:10.5px;color:var(--faint);font-weight:600;margin-top:1px;line-height:1.3;}
+  .fs .d{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45;}
+  .fs .d b{color:var(--amber);font-weight:800;}
+  .fs .pnote{font-size:10px;color:var(--faint);margin-top:4px;line-height:1.4;}
+  .fs.hitl{border-color:var(--amber-line);border-top-color:#e5a93b;background:#fffdf7;}
+  .fs.hitl .ix{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-line);}
+  .fs.out{border-top-color:var(--navy2);background:linear-gradient(180deg,#0f2a63,#12306e);color:#fff;}
+  .fs.out .ix{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);color:#fff;}
+  .fs.out .t{color:#fff;}
+  .fs.out .en{color:#9db9ee;}
+  .fs.out .d{color:#c6d8fa;}
+  .fs.note{background:#f7fafe;border:1px dashed #cdd9ec;border-top:1px dashed #cdd9ec;justify-content:center;}
+  .fs.note .d{margin-top:4px;color:#4b5f84;}
+  .hbadge{position:absolute;top:-9px;right:8px;font-size:9px;font-weight:800;letter-spacing:.05em;background:#e5a93b;color:#fff;
+          padding:2px 7px;border-radius:999px;box-shadow:0 2px 6px rgba(180,83,9,.3);white-space:nowrap;}
+  .sd{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.02em;color:#37517a;background:#eef4fc;border:1px solid #d9e4f5;
+      border-radius:5px;padding:1px 5px;margin:1px 2px 1px 0;line-height:1.7;}
+  .sd.hl{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+  /* F/I/U 表达规则 */
+  .fiu{margin-top:14px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid var(--line);
+       border-left:4px solid var(--blue);border-radius:11px;padding:8px 14px;font-size:12px;color:var(--muted);}
+  .fiu .lb{font-weight:800;color:var(--ink);margin-right:2px;white-space:nowrap;}
+  .ft{font-size:10.5px;font-weight:800;padding:1px 8px;border-radius:999px;white-space:nowrap;}
+  .ft.f{background:var(--green-bg);color:var(--green);border:1px solid var(--green-line);}
+  .ft.i{background:var(--sky);color:var(--blue-d);border:1px solid var(--skyline);}
+  .ft.u{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-line);}
+
+  /* 机制卡 */
+  .mech2{display:grid;grid-template-columns:1.12fr .88fr;gap:12px;margin-top:12px;}
+  .mech2 .card{padding:13px 16px;}
+  .mech2 .card h3{font-size:14.5px;margin-bottom:2px;}
+  .mech2 .card .sub{font-size:11px;color:var(--faint);margin-bottom:7px;font-weight:600;}
+  .rd{display:flex;gap:9px;align-items:baseline;padding:3.5px 0;font-size:12px;color:#334155;border-bottom:1px dashed var(--line-soft);}
+  .rd:last-child{border-bottom:none;}
+  .rd .k{flex:none;width:132px;font-weight:800;color:var(--ink);font-size:11.5px;}
+  .rd span em{font-style:normal;color:var(--faint);font-weight:500;}
+  .guard{margin-top:8px;background:var(--amber-bg);border:1px solid var(--amber-line);border-radius:9px;padding:8px 11px;font-size:12px;color:#5b3a13;line-height:1.5;}
+  .guard b{color:var(--amber);}
+  .guard .nz{display:block;margin-top:3px;color:var(--amber);font-weight:700;}
+  .def{font-size:12.5px;color:#334155;margin-top:3px;line-height:1.55;}
+  .def b{color:var(--ink);}
+  .hier{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px;}
+  .hier .hd2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+  .hier .hd2 h3{font-size:14.5px;}
+  .ladder{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin:4px 0 9px;}
+  .la{font-size:11.5px;font-weight:700;color:#37517a;background:#f3f8ff;border:1px solid var(--skyline);padding:3px 9px;border-radius:999px;white-space:nowrap;}
+  .la.l1{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:800;}
+  .la.se{background:#fff;border-style:dashed;color:#8a97ad;font-weight:600;}
+  .gt{color:#93a6c6;font-weight:900;font-size:10px;}
+  .ladder-note{margin:0 0 8px;font-size:10.5px;color:var(--faint);line-height:1.55;}
+  .ladder-note b{color:#6b7c99;}
+  .hrules{display:grid;grid-template-columns:1fr 1fr;gap:4px 18px;}
+  .hr{font-size:12px;color:#334155;position:relative;padding-left:15px;line-height:1.5;}
+  .hr::before{content:"";position:absolute;left:1px;top:8px;width:5px;height:5px;border-radius:50%;background:var(--blue);}
+  .hr b{color:var(--ink);}
+  .confk{display:inline-block;font-size:10.5px;font-weight:800;color:#b42318;background:#fff;border:1px dashed #f0a89e;
+         border-radius:6px;padding:0 7px;margin:0 3px;white-space:nowrap;}
+  .no-vote{margin-top:7px;font-size:11px;color:var(--faint);}
+  .no-vote b{color:#b42318;}
+
+  /* Evidence Expression Guardrail */
+  .guardline{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;}
+  .gl{border-radius:11px;padding:9px 14px;font-size:12px;line-height:1.55;}
+  .gl .lb{display:block;font-size:10px;font-weight:800;letter-spacing:.06em;margin-bottom:3px;}
+  .gl1{background:var(--amber-bg);border:1px solid var(--amber-line);color:#5b3a13;}
+  .gl1 .lb{color:var(--amber);}
+  .gl2{background:#f3f8ff;border:1px solid var(--skyline);color:#31466f;}
+  .gl2 .lb{color:var(--blue-d);}
+
+  /* 输出结构 */
+  .out-head{margin:22px 4px 10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .out-head b{font-size:14px;}
+  .out-head span{font-size:11.5px;color:var(--muted);}
+  .outgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+  .ob{background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 10px;}
+  .ob .oi{font-size:10px;font-weight:800;color:#fff;background:var(--blue);width:18px;height:18px;border-radius:6px;
+          display:flex;align-items:center;justify-content:center;margin-bottom:5px;}
+  .ob .en{font-size:10.5px;font-weight:800;color:var(--blue-d);letter-spacing:.02em;line-height:1.3;}
+  .ob .zh{font-size:11.5px;color:#2a3a55;margin-top:2px;line-height:1.4;}
+  .ob.fv{border-color:#94d3ad;background:linear-gradient(180deg,#fff 0%,#f3fbf6 100%);}
+  .ob.fv .en{color:var(--green);}
+  .ob.fv .en i{font-style:normal;font-weight:800;}
+  .ob.sc{background:linear-gradient(180deg,#0f2a63,#12306e);border-color:#3f5ea8;color:#fff;}
+  .ob.sc .oi{background:#8ec5ff;color:#0b1f45;}
+  .ob.sc .en{color:#8ec5ff;}
+  .ob.sc .zh{color:#cfe0fa;}
+  .ob i{font-style:normal;}
+
+  /* 条件 HITL 卡 */
+  .hitl-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+  .hitl{background:#fff;border:1px solid var(--amber-line);border-radius:15px;overflow:hidden;}
+  .hitl .hd{display:flex;align-items:center;gap:9px;background:linear-gradient(120deg,#fff4de,#fffaf0);border-bottom:1px solid var(--amber-line);padding:8px 14px;}
+  .hitl .hbx{flex:none;font-size:10px;font-weight:800;letter-spacing:.06em;background:#d97706;color:#fff;border-radius:6px;padding:2px 7px;white-space:nowrap;}
+  .hitl .hd b{font-size:13px;}
+  .hitl .cond{margin-left:auto;flex:none;font-size:10px;font-weight:800;color:#92400e;background:#fff;border:1px solid var(--amber-line);
+              padding:2px 9px;border-radius:999px;letter-spacing:.05em;white-space:nowrap;}
+  .hitl .bd{padding:10px 14px 12px;}
+  .hitl .bd .lbl{font-size:10px;font-weight:800;letter-spacing:.12em;color:var(--amber);margin:6px 0 1px;}
+  .hitl .bd p{font-size:12.5px;color:#334155;line-height:1.5;}
+  .hitl .bd p b{color:#1f2937;}
+  .mini{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
+  .mini .m{font-size:11px;border:1px solid var(--amber-line);background:var(--amber-bg);color:var(--amber);border-radius:999px;padding:1px 9px;font-weight:600;}
+  .mini .m.normal{background:var(--sky);border-color:var(--skyline);color:var(--blue-d);}
+  .mini .m.no{background:#fff;border:1px solid #e5eaf3;color:#94a0b5;text-decoration:line-through;text-decoration-color:#c04a3c;font-weight:600;}
+
+  /* ============ 05 ============ */
+  .g4a{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+  .why-c .card{padding:12px 14px;}
+  .why-c .card .top{display:flex;align-items:center;gap:7px;margin-bottom:5px;background:none;position:static;color:inherit;}
+  .why-c .card h3{font-size:14px;}
+  .why-c .card p{font-size:12.5px;color:var(--muted);}
+  .why-c .card .mini{display:block;margin-top:7px;font-size:10.5px;font-weight:800;letter-spacing:.06em;color:var(--blue-d);}
+  .why-tail{margin-top:12px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:13px 18px;font-size:13px;color:#334155;}
+  .why-tail b{color:var(--ink);}
+  .why-tail .avs{display:flex;gap:9px;flex-wrap:wrap;margin-top:8px;}
+  .avs .a{font-size:12px;border:1px solid var(--skyline);background:var(--sky);color:var(--blue-d);border-radius:10px;padding:5px 12px;font-weight:700;}
+
+  /* ============ 06 ============ */
+  .ruleband{background:linear-gradient(120deg,#0b1f45,#173a8a);border-radius:16px;padding:16px 24px;color:#fff;
+            display:flex;align-items:center;gap:18px;flex-wrap:wrap;box-shadow:0 10px 26px rgba(11,31,69,.22);}
+  .ruleband .rtg{flex:none;font-size:11px;font-weight:800;letter-spacing:.14em;color:#93c5fd;border:1px solid #4c74c9;padding:5px 10px;border-radius:8px;}
+  .ruleband p{font-size:17px;font-weight:800;letter-spacing:.02em;}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;}
+  .colbox{border-radius:15px;padding:15px 18px;border:1px solid var(--line);background:var(--card);}
+  .colbox.auto{border-top:3px solid var(--blue);}
+  .colbox.usr{border-top:3px solid #d97706;}
+  .colbox h3{font-size:14.5px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+  ul.li.auto li::before{background:var(--blue);}
+  ul.li.usr li::before{background:#d97706;}
+  ul.li li .tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.05em;background:#fff4de;color:var(--amber);border:1px solid var(--amber-line);border-radius:999px;padding:0 7px;margin-left:6px;vertical-align:1px;}
+  ul.li li .warn{display:inline-block;font-size:10px;font-weight:800;background:#fdf0ee;color:#b42318;border:1px solid #f2c6bf;border-radius:999px;padding:0 7px;margin-left:6px;}
+
+  /* ============ 07 ============ */
+  .scope{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .sc-card{border-radius:15px;padding:16px 18px;border:1px solid var(--line);background:var(--card);}
+  .sc-card.in{border-top:3px solid var(--green);}
+  .sc-card.out{border-top:3px solid #cbd5e1;}
+  .sc-card h3{font-size:15px;display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  ul.li.in li::before{background:var(--green);}
+  ul.li.out li{color:#68758a;}
+  ul.li.out li::before{content:"✕";display:flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:#f1f5f9;border:1px solid #e2e8f0;color:#b91c1c;position:absolute;left:0;top:6px;font-size:9px;}
+  .def-zone{margin-top:9px;background:#f3fbf6;border:1px solid var(--green-line);border-radius:10px;padding:8px 12px;font-size:12px;color:#2f5a3f;line-height:1.5;}
+  .def-zone b{color:var(--green);}
+  .no-more{margin-top:10px;font-size:12px;color:var(--faint);background:#fff;border:1px dashed #dbe3ef;border-radius:11px;padding:7px 14px;}
+  .no-more b{color:var(--amber);}
+
+  /* ============ 08 ============ */
+  table.metric{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:12.5px;}
+  .metric th{background:#0f2a63;color:#fff;text-align:left;padding:9px 14px;font-size:12.5px;font-weight:700;}
+  .metric td{padding:9px 14px;border-top:1px solid var(--line-soft);vertical-align:top;color:#334155;line-height:1.55;}
+  .metric td.dim{font-weight:800;color:var(--ink);white-space:nowrap;}
+  .metric tr:first-child td{border-top:none;}
+  .metric .ok{color:var(--green);font-weight:700;}
+  .metric .ko{color:#b42318;font-weight:700;}
+  .safe{margin-top:14px;border:1px solid var(--skyline);background:linear-gradient(120deg,#f3f8ff,#eaf2ff);border-radius:14px;padding:12px 18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+  .safe .sl{flex:none;font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--blue-d);}
+  .safe .s{font-size:12px;color:#31466f;border:1px solid #cfe0fa;background:#fff;border-radius:999px;padding:3px 11px;}
+  .safe .s i{font-style:normal;color:var(--blue);font-weight:800;margin-right:4px;}
+
+  footer{margin-top:38px;background:var(--navy);color:#aebfe2;padding:20px 0 26px;text-align:center;font-size:12px;}
+  footer .f1{font-size:13px;color:#fff;font-weight:700;margin-bottom:4px;}
+
+  /* ============ 响应式 ============ */
+  @media (max-width:1080px){
+    .flow{grid-template-columns:repeat(2,1fr);}
+    .outgrid{grid-template-columns:repeat(3,1fr);}
+    .chain{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+    .carr{display:none;}
+    .mech2{grid-template-columns:1fr;}
+    .hrules{grid-template-columns:1fr;}
+  }
+  @media (max-width:900px){
+    .hero-in{grid-template-columns:1fr;padding-top:30px;}
+    .g2,.g3,.split,.scope,.hitl-grid,.pain-out,.g4a,.guardline{grid-template-columns:1fr;}
+    .h1wrap h1{font-size:32px;}
+    .g4{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));}
+  }
+  @media (max-width:640px){
+    .shell{padding:0 16px;}
+    .flow{grid-template-columns:repeat(2,1fr);}
+    .outgrid{grid-template-columns:repeat(2,1fr);}
+    .chain{grid-template-columns:1fr;}
+    .principle p{font-size:15px;}
+    .sh h2{font-size:18px;}
+    .stmt .big{font-size:17px;}
+    .rd .k{width:auto;flex:none;}
+    .rd{flex-wrap:wrap;gap:2px 9px;}
+  }
+  @media (max-width:420px){
+    .flow{grid-template-columns:1fr;}
+    .outgrid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= 顶部导航 ================= -->
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand"><span class="dot"></span><b>SignalLens</b><span>· AI 投研助手</span></div>
+    <nav class="nav">
+      <a href="http://localhost:8899/01_product_interaction.html#s01"><i>01</i>用户与场景</a>
+      <a href="http://localhost:8899/01_product_interaction.html#s02"><i>02</i>痛点</a>
+      <a href="http://localhost:8899/01_product_interaction.html#s03"><i>03</i>产品判断</a>
+      <a href="http://localhost:8899/01_product_interaction.html#s04"><i>04</i>交互流程</a>
+      <a href="http://localhost:8899/01_product_interaction.html#s05"><i>05</i>Why Agent</a>
+      <a href="http://localhost:8899/01_product_interaction.html#s06"><i>06</i>分工与确认</a>
+      <a href="http://localhost:8899/01_product_interaction.html#s07"><i>07</i>Scope</a>
+      <a href="http://localhost:8899/01_product_interaction.html#s08"><i>08</i>成立依据</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="hero-in">
+    <div>
+      <div class="h-badge">产品方案 · <em>交付物 01 / 03</em> · 约 3 分钟读完</div>
+      <div class="h1wrap">
+        <h1>SignalLens<br><span>AI 投研助手</span></h1>
+      </div>
+      <p class="lead">不是告诉你 <b>“买还是卖”</b> 的 AI，而是把 <b>信息 → 事实 → 影响路径 → 不确定性</b> 讲清楚的
+        <span class="chips-inline">“解释型”投研助手</span>。</p>
+      <div class="principle">
+        <span class="tag">CORE RULE</span>
+        <p>AI 负责筛选、验证和解释信息；用户保留最终投资决策权。
+          <small>这不是免责声明 —— 它是产品最核心的设计决策</small></p>
+      </div>
+      <div class="h-meta">
+        <span class="mk"><i>■</i>已有自选股的个人投资者</span>
+        <span class="mk"><i>■</i>自选股明显波动 / 大量新闻 / 重大公告之后</span>
+        <span class="mk"><i>■</i>单标的 × 单事件 × 一次解释型问答</span>
+        <span class="mk"><i>■</i>事实绑定来源 · 未来只写 Scenario</span>
+      </div>
+    </div>
+
+    <div class="pipe">
+      <div class="pipe-head"><b>3 秒看懂：它如何工作</b><span>HOW IT WORKS</span></div>
+
+      <div class="row">
+        <div class="rt"><span class="ic i1">1</span><b>输入 · 用户一句话提问</b></div>
+        <p class="qa">“<b>我的自选股今天为什么大跌？</b>” + 用户自选股背景</p>
+        <div class="chip">实时行情</div><div class="chip">公告</div><div class="chip">新闻</div>
+      </div>
+      <div class="arrline">↓</div>
+
+      <div class="row">
+        <div class="rt"><span class="ic i2">2</span><b>Agent 自动跑完主链路</b></div>
+        <p class="qa">澄清（按需）→ 获取与过滤 → 事实验证 → 影响分析 → <b>先给出六段式完整输出</b></p>
+        <div class="chip">全自动</div><div class="chip">全程可复核</div><div class="chip">无歧义不打断</div>
+      </div>
+      <div class="arrline">↓</div>
+
+      <div class="row">
+        <div class="rt"><span class="ic i3">3</span><b>追问 · 基于已见输出的 Review</b></div>
+        <p class="qa">结果之后再追问；只有开口要<b>“买 / 卖”</b>时才切 Decision Support，仍不给结论</p>
+      </div>
+
+      <div class="nozone"><b>AI 明确不输出：</b><s>Buy / Sell</s><s>目标价</s><s>股票评分</s><s>收益预测</s><s>自动选股</s></div>
+    </div>
+  </div>
+</section>
+
+<main class="shell">
+
+  <!-- ============ 01 核心用户与场景 ============ -->
+  <section class="sec" id="s01">
+    <div class="sh">
+      <span class="num">01</span>
+      <div><h2>核心用户与场景</h2><p>谁、在什么情况下、打开 SignalLens</p></div>
+    </div>
+    <p class="kicker">一句话：<b>已有自选股、会主动看财经信息、但缺乏专业投研训练</b> 的个人投资者 —— 在标的出现明显异动后，想快速搞懂发生了什么。</p>
+
+    <div class="g2">
+      <div class="card">
+        <div class="ct"><span class="pill blue">WHO</span><h3>用户画像</h3></div>
+        <ul class="li">
+          <li><b>已建立自选股</b>：有长期关注的标的，不是全市场漫游</li>
+          <li><b>会主动看财经信息</b>：新闻、公告、行情都会看，但时间有限</li>
+          <li><b>缺专业投研训练</b>：能读信息，但难以自己完成系统化拆解</li>
+          <li><b>保留判断权</b>：不想把决策交给黑盒，只想更快、更准地理解</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="ct"><span class="pill blue">WHEN</span><h3>核心场景：自选股出现明显异动后</h3></div>
+        <div class="trig">
+          <span class="t">行情明显波动</span>
+          <span class="t">大量新闻集中出现</span>
+          <span class="t">重大公告 / 监管披露</span>
+        </div>
+        <div class="qr">
+          <div class="q"><span class="qi">1</span><div><b>到底发生了什么？</b><span>把碎片信息拼成一条完整时间线</span></div></div>
+          <div class="q"><span class="qi">2</span><div><b>哪些信息真正重要？</b><span>几十条资讯里找出真正影响标的的少数几条</span></div></div>
+          <div class="q"><span class="qi">3</span><div><b>为什么会影响到我的这只股票？</b><span>讲清事件到股价之间的传导路径</span></div></div>
+          <div class="q"><span class="qi">4</span><div><b>哪些是事实、哪些只是推断？</b><span>已发生的 vs 各方观点 vs 未来猜测</span></div></div>
+          <div class="q"><span class="qi">5</span><div><b>接下来我应该重点观察什么？</b><span>给出可验证的观察指标，而不是结论</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 02 核心痛点 ============ -->
+  <section class="sec" id="s02">
+    <div class="sh">
+      <span class="num">02</span>
+      <div><h2>核心痛点：用户不缺信息，缺的是信号</h2><p>问题不在“信息不够”，而在“信息太多、太难过滤”</p></div>
+    </div>
+
+    <div class="stmt" style="margin-bottom:14px;">
+      <div class="lab">PAIN STATEMENT</div>
+      <div class="big">用户并不缺财经信息。真正的痛是：信息 <span class="hlb">碎片化、重复、专业、噪音高</span>，普通投资者很难从中
+        <span class="hlb">识别真正影响自己标的的信号</span>，并容易<span class="hlb">混淆事实与未来推断</span>。</div>
+    </div>
+
+    <div class="g4 pain-cards">
+      <div class="card"><h3>碎片化</h3><p>同一件事被切成几十条短消息，分散在行情、新闻、社区，难以拼出全貌。</p></div>
+      <div class="card"><h3>重复冗余</h3><p>同一公告被多平台反复搬运、反复解读，真正的新增信息很少。</p></div>
+      <div class="card"><h3>专业门槛高</h3><p>财报术语、监管措辞、投行行话多，普通投资者消化成本很高。</p></div>
+      <div class="card"><h3>噪音干扰大</h3><p>标题党、情绪化评论、蹭热点内容与真信号混在一起，真假难辨。</p></div>
+    </div>
+
+    <div class="pain-out">
+      <div class="out-arrow">↓ 结果</div>
+      <div class="po a"><b>识别失败</b>花了大量时间，仍抓不住“真正影响我标的”的那条关键信号</div>
+      <div class="po b"><b>认知风险</b>事实与未来推断混在一起，容易被情绪与噪音带节奏</div>
+    </div>
+  </section>
+
+  <!-- ============ 03 核心产品判断 ============ -->
+  <section class="sec" id="s03">
+    <div class="sh">
+      <span class="num">03</span>
+      <div><h2>核心产品判断</h2><p>在这一场景下，为什么把它定位成“信息过滤器 + 研究解释器”</p></div>
+    </div>
+
+    <div class="stmt">
+      <div class="lab">CORE JUDGEMENT · 限定在“自选股出现明显事件”这一场景</div>
+      <div class="big">在这一场景下，普通投资者优先需要的，<span class="hl">不是直接告诉他“买还是卖”的 AI</span>，
+        而是一个把 <span class="hlb">信息 → 事实 → 影响路径 → 不确定性</span> 讲清楚的 <span class="hlb">解释型 AI 投研助手</span>。</div>
+    </div>
+
+    <div class="chain">
+      <div class="cnk"><div class="en">01 · INFORMATION</div><div class="zh">信息</div><p>把相关公告、新闻、行情聚合为一条完整事实链</p><div class="shade">输入：杂乱、冗余、高噪音</div></div>
+      <div class="carr">→</div>
+      <div class="cnk"><div class="en">02 · FACT</div><div class="zh">事实</div><p>区分已发生的硬事实与各方观点，关键事实绑定来源</p><div class="shade">交叉验证，不轻信单一信源</div></div>
+      <div class="carr">→</div>
+      <div class="cnk"><div class="en">03 · IMPACT PATH</div><div class="zh">影响路径</div><p>解释事件如何一步步传导到“我关注的这只股票”</p><div class="shade">个性化：结合标的自身逻辑</div></div>
+      <div class="carr">→</div>
+      <div class="cnk"><div class="en">04 · UNCERTAINTY</div><div class="zh">不确定性</div><p>对未发生的事只给情景，不预测点位、不承诺涨跌</p><div class="shade">决策输入，而非决策本身</div></div>
+    </div>
+
+    <div class="role-strip">
+      <b>产品角色：信息过滤器 + 研究解释器</b> —— 滤掉噪音、验证事实、把影响路径“翻译”成普通投资者能读懂的解释；
+      它不替你判断买卖，更不是荐股师。
+      <span class="pill amber" style="margin-left:auto;">不荐股 · 不评分 · 不输出买卖指令</span>
+    </div>
+  </section>
+
+  <!-- ============ 04 MVP 交互流程 ============ -->
+  <section class="sec s4" id="s04">
+    <div class="sh">
+      <span class="num">04</span>
+      <div><h2>MVP 交互流程 · 一次解释型问答的用户旅程</h2><p>7 步主链路：清晰问题全自动跑通；两道 HITL 门仅按条件触发</p></div>
+    </div>
+
+    <div class="s4band">
+      <div class="shell">
+        <div class="flow-meta">
+          <span class="fchip auto"><i>✓</i>正常路径：问题明确 → ② 直接放行 → ⑥ 首次完整输出，全程无需打断</span>
+          <span class="fchip order"><i>→</i>执行顺序：过滤候选 → 验证事实 → 再判断多重要 → 再解释影响</span>
+          <span class="fchip hitl"><i>◇</i>CONDITIONAL HITL ①② · 仅条件触发，不是必经节点</span>
+        </div>
+
+        <div class="flow">
+          <!-- 1 -->
+          <div class="fs">
+            <div class="top"><span class="ix">1</span></div>
+            <div class="t">Ask / Trigger</div>
+            <div class="en">用户提问与触发</div>
+            <div class="d">从自选股异动提醒、新闻或用户主动提问进入本次分析。</div>
+          </div>
+          <!-- 2 -->
+          <div class="fs hitl">
+            <span class="hbadge">CONDITIONAL HITL ①</span>
+            <div class="top"><span class="ix">2</span></div>
+            <div class="t">Context &amp; Clarification</div>
+            <div class="en">上下文读取与澄清</div>
+            <div class="d">读取自选股、当前标的与必要的历史浏览 / 关注上下文。标的、事件或时间范围有歧义 → <b>门 ① 轻量确认</b>；明确 → 直接继续，不强制打断。</div>
+            <div class="pnote">浏览历史只用于提升相关性，不推断风险偏好、不代替用户决策。</div>
+          </div>
+          <!-- 3 -->
+          <div class="fs">
+            <div class="top"><span class="ix">3</span></div>
+            <div class="t">Retrieve &amp; Filter</div>
+            <div class="en">获取与过滤（自动）</div>
+            <div class="sd">DEDUP</div><div class="sd">RELEVANCE</div><div class="sd">INFO GAIN</div><div class="sd">SOURCE QUALITY</div><div class="sd">TIMELINESS</div>
+            <div class="d">获取行情 / 公司公告 / 财经新闻等已接入数据，按 5 维过滤去噪。</div>
+            <div class="pnote">输出 <b>Candidate Signals</b> → 进入 ④ 验证；此步不下“多重要”结论。</div>
+          </div>
+          <!-- 4 -->
+          <div class="fs">
+            <div class="top"><span class="ix">4</span></div>
+            <div class="t">Verify Evidence</div>
+            <div class="en">事实验证与 Grounding</div>
+            <div class="d">对 Candidate Signals 做<b>事实核验 + Source Grounding + Source Conflict 处理</b>，按 Source Hierarchy 引用原始披露。</div>
+          </div>
+          <!-- 5 -->
+          <div class="fs">
+            <div class="top"><span class="ix">5</span></div>
+            <div class="t">Materiality &amp; Impact Analysis</div>
+            <div class="en">Materiality 与影响分析（自动）</div>
+            <div class="sd hl">MATERIALITY SORT</div>
+            <div class="d">仅对<b>已完成验证</b>（或已标注「Source conflict / 尚未完全确认」）的 Signal：先排 Materiality，再沿 事件 → 公司业务 / 财务 → 市场预期 → 可能的标的影响 展开路径。</div>
+            <div class="pnote">不强行归因：证据不足时只表达“可能驱动因素 / 相关因素”。</div>
+          </div>
+          <!-- 6 -->
+          <div class="fs out">
+            <div class="top"><span class="ix">6</span></div>
+            <div class="t">Explain Output</div>
+            <div class="en">首次完整分析输出</div>
+            <div class="d">六段式解释在此<b style="color:#8ec5ff;">完整输出（结构见下）</b>——用户先看到分析结果，才能进入下一步追问。</div>
+          </div>
+          <!-- 7 -->
+          <div class="fs hitl">
+            <span class="hbadge">CONDITIONAL HITL ②</span>
+            <div class="top"><span class="ix">7</span></div>
+            <div class="t">Follow-up / Decision Support</div>
+            <div class="en">追问与决策支持（按需）</div>
+            <div class="d">用户基于已见输出继续 Review / 追问。仅当索要“该买吗 / 该卖吗 / 能不能上车”等交易决策时 → <b>门 ②</b> 切入 Decision Support，仍不直接给 Buy/Sell。</div>
+          </div>
+          <!-- note -->
+          <div class="fs note">
+            <div class="t" style="color:#4b5f84;">按需通过，不是必经</div>
+            <div class="d">多数问答到 ⑥ 即完成；① 只在有歧义时、② 只在被索要交易决策时打开。</div>
+          </div>
+        </div>
+
+        <!-- F/I/U 表达规则 -->
+        <div class="fiu">
+          <span class="lb">核心表达规则（贯穿 ④–⑥，不单独占流程节点）：</span>
+          <span class="ft f">FACT 事实 · 已发生、可绑定来源</span>
+          <span class="ft i">INTERPRETATION 观点 · 与事实分层标注</span>
+          <span class="ft u">UNCERTAINTY 未来场景 · 不作确定性预测</span>
+          <span>同一解释中三者始终分离呈现。</span>
+        </div>
+
+        <!-- 机制：Noise & Materiality -->
+        <div class="mech2">
+          <div class="card">
+            <div class="ct" style="margin-bottom:3px;"><span class="pill gray">RULE · FILTER</span><h3>Noise Filtering 只依据 5 个维度</h3></div>
+            <div class="sub">与信息观点方向无关 —— 过滤决定“留 / 不留”</div>
+            <div class="rd"><span class="k">Duplicate 重复</span><span>同一事实 / 同一转载的重复表达</span></div>
+            <div class="rd"><span class="k">Relevance 相关</span><span>是否与当前标的和问题真正相关</span></div>
+            <div class="rd"><span class="k">Info Gain 增量</span><span>是否包含新增事实或新增证据</span></div>
+            <div class="rd"><span class="k">Source Quality 信源</span><span>原始披露或可信信息源</span></div>
+            <div class="rd"><span class="k">Timeliness 时效</span><span>仍处于当前分析时间窗口</span></div>
+            <div class="guard"><b>Guardrail · 观点中立：</b>SignalLens 不按观点方向过滤信息。即使与用户原有观点相反，只要相关、可信、有增量，就必须保留。
+              <span class="nz">反方观点 ≠ Noise —— 反对意见、挑战信息恰是要展示给用户的部分。</span></div>
+          </div>
+
+          <div class="card">
+            <div class="ct" style="margin-bottom:3px;"><span class="pill blue">RULE · RANK</span><h3>Materiality Scoring · 在验证之后判断“多重要”</h3></div>
+            <div class="sub">只评估“已通过 ④ 验证、或被明确标注尚未完全确认”的 Candidate Signal</div>
+            <p class="def">对<b>事实已被验证的真实新信息</b>，评估其可能对公司的 <b>业务 / 财务表现 / 市场预期</b> 产生多大的<b>实质影响</b>。</p>
+            <ul class="li">
+              <li>过滤回答<b>“留不留”</b>，核验回答<b>“真不真”</b>，Materiality 回答<b>“多重要 / 排第几”</b></li>
+              <li>高影响 Signal 进入 ⑤ 影响路径解释，并在输出中置顶</li>
+              <li>打分只用于排序与解释，<b>不预测涨跌、不构成任何建议</b></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Evidence Expression Guardrail -->
+        <div class="guardline">
+          <div class="gl gl1"><span class="lb">GUARDRAIL · 因果归因 不强行归因</span>行情波动不强行归因：若证据无法证明某一事件是股价变化的直接原因，不把时间先后共现写成确定因果，而使用“可能驱动因素 / 相关因素”表达。</div>
+          <div class="gl gl2"><span class="lb">EVIDENCE STRENGTH · HIGH / MEDIUM / LOW</span>核心 Signal 可标注证据强度。该 Confidence 只表示“当前解释有多强的证据支持”，绝不代表股票涨跌概率、收益预测或投资建议置信度。</div>
+        </div>
+
+        <!-- Source Hierarchy -->
+        <div class="hier">
+          <div class="hd2">
+            <span class="pill gray">RULE · SOURCE</span>
+            <h3>Evidence Verification · Source Hierarchy（证据分级）</h3>
+          </div>
+          <div class="ladder">
+            <span class="la l1">公司公告 / 官方披露</span><span class="gt">›</span>
+            <span class="la">权威财经新闻</span>
+            <span class="gt">│</span>
+            <span class="la se">券商研报摘要 *</span><span class="gt">›</span>
+            <span class="la se">社交平台讨论 *</span>
+          </div>
+          <div class="ladder-note">公司事件事实：优先使用 <b>公司公告 / 官方披露</b>，其次使用 <b>权威财经新闻</b>；价格、涨跌幅、成交量等 <b>市场事实直接以实时 / 历史行情数据接口为准</b>。带 <b>*</b> 的券商研报摘要与社交平台讨论，仅在对应数据源接入后作为 <b>Secondary Context / 线索层</b> 使用，不作为当前 MVP 关键事实的 Primary Source。</div>
+          <div class="hrules">
+            <div class="hr"><b>优先原始来源：</b>能找到第一方原始披露时，关键事实优先引用公司公告 / 官方披露。</div>
+            <div class="hr"><b>冲突处理：</b>财经新闻与公司原始披露冲突 → 以原始披露为准。</div>
+            <div class="hr"><b>未决冲突：</b>不强行生成确定结论，明确标注 <span class="confk">Source conflict / 尚未确认</span>。</div>
+            <div class="hr"><b>Secondary Context：</b>研报摘要 / 社媒讨论仅在数据源接入后作线索层，不作当前 MVP 的 Primary Source。</div>
+          </div>
+          <div class="no-vote">判定原则：<b>不用“多数来源投票”</b>来决定事实真伪 —— 权重按 Source Hierarchy，而不是按来源数量。</div>
+        </div>
+
+        <!-- 输出结构 -->
+        <div class="out-head">
+          <b>Explain Output · 六段式结构</b>
+          <span>首次输出与后续追问复用同一套结构。</span>
+        </div>
+        <div class="outgrid">
+          <div class="ob"><div class="oi">1</div><div class="en">What Happened</div><div class="zh">发生了什么</div></div>
+          <div class="ob"><div class="oi">2</div><div class="en">Key Signals</div><div class="zh">关键信号</div></div>
+          <div class="ob"><div class="oi">3</div><div class="en">Why It Matters</div><div class="zh">为什么影响该股</div></div>
+          <div class="ob fv"><div class="oi">4</div><div class="en">Fact <i>vs</i> Interpretation</div><div class="zh">事实 / 观点 / 推断 分层</div></div>
+          <div class="ob fv"><div class="oi">5</div><div class="en">Scenario / Uncertainty</div><div class="zh">情景与不确定性</div></div>
+          <div class="ob sc"><div class="oi">6</div><div class="en">What to Watch</div><div class="zh">后续观察指标</div></div>
+        </div>
+
+        <!-- 两道条件门详解 -->
+        <div class="hitl-grid">
+          <div class="hitl">
+            <div class="hd"><span class="hbx">HITL ① · CONDITIONAL</span><b>Clarification Gate · 澄清门</b><span class="cond">条件触发</span></div>
+            <div class="bd">
+              <div class="lbl">触发条件（只有歧义才开）</div>
+              <p>标的 / 事件 / 时间范围 / 问题边界不清时触发；<b>问题明确则直接跳过，不打断主链路</b>。</p>
+              <div class="lbl">AI 的做法</div>
+              <p><b>不猜。</b>一次轻量点选式确认，确认后全自动跑到输出。</p>
+              <div class="mini">
+                <span class="m">确认标的</span><span class="m">事件时间窗</span><span class="m">问题边界</span>
+                <span class="m normal">问题明确 → 全自动直达输出</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hitl">
+            <div class="hd"><span class="hbx">HITL ② · CONDITIONAL</span><b>Decision Boundary · 决策边界</b><span class="cond">条件触发</span></div>
+            <div class="bd">
+              <div class="lbl">触发条件（只在看过输出之后）</div>
+              <p>用户已看到 ⑥ 首次输出，仍索要“该买吗 / 该卖吗 / 能不能上车”等<b>交易决策</b>时才触发。</p>
+              <div class="lbl">AI 的做法</div>
+              <p><b>不给结论</b>，反向确认两件事：关注周期（短期行情事件 / 中长期基本面）+ 风险因素；随后只交付 Scenario、支持 / 挑战条件、观察指标。</p>
+              <div class="mini">
+                <span class="m">Scenario 情景</span><span class="m">支持 / 挑战条件</span><span class="m">观察指标</span>
+                <span class="m no">Buy/Sell</span><span class="m no">目标价</span><span class="m no">评分</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 Why Agent ============ -->
+  <section class="sec" id="s05">
+    <div class="sh">
+      <span class="num">05</span>
+      <div><h2>Why Agent：这不是一次 Chatbot 问答</h2><p>把“看起来只是一个问题”的事拆开看，它是一条多步、多工具、持续上下文的证据链</p></div>
+    </div>
+    <p class="kicker">单次问答 = 回答一个问题；<b>SignalLens Agent = 为你的自选股跑通一条“获取 → 验证 → 解释”的证据链</b>，并在一次会话里支持反复追问。</p>
+
+    <div class="g4a why-c">
+      <div class="card"><div class="top"><span class="pill blue">实时</span></div><h3>事件是动态发生的</h3><p>行情、新闻、公告随时更新，需要多数据源持续接入与跟踪。</p><span class="mini">多数据源 · 实时</span></div>
+      <div class="card"><div class="top"><span class="pill blue">去重</span></div><h3>信息重复且爆炸</h3><p>同一事件被多平台反复搬运，跨源去重与噪音过滤是强需求。</p><span class="mini">跨源去重 · 噪音过滤</span></div>
+      <div class="card"><div class="top"><span class="pill blue">相关性</span></div><h3>“相关”要结合背景</h3><p>判断一条信息是否重要，必须理解公司业务与用户自选股历史。</p><span class="mini">自选股背景 · 上下文</span></div>
+      <div class="card"><div class="top"><span class="pill blue">验证</span></div><h3>事实必须交叉验证</h3><p>关键事实需多源比对、按证据分级绑定来源，不能只信单一信源。</p><span class="mini">交叉验证 · Source Grounding</span></div>
+      <div class="card"><div class="top"><span class="pill blue">分层</span></div><h3>事实与推断要分离</h3><p>需要把硬事实、观点与未来推断拆开，这是普通解读最难的一步。</p><span class="mini">Fact / Interpretation 分离</span></div>
+      <div class="card"><div class="top"><span class="pill blue">追问</span></div><h3>解释允许被追问</h3><p>用户会继续追问，需要维持会话上下文做二次挖掘。</p><span class="mini">持续对话上下文</span></div>
+    </div>
+
+    <div class="why-tail">
+      <b>结论：</b>流程是“多步骤 + 多 Tool + 持续上下文”，因此由 Agent 编排，而不是一次性 Chatbot 输出。
+      用户问题只是入口，真正交付的是：
+      <div class="avs">
+        <span class="a">多步任务编排</span>
+        <span class="a">多数据源工具调用</span>
+        <span class="a">持续上下文记忆</span>
+        <span class="a">用户可复核的证据链</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 06 AI自动完成 vs 用户确认 ============ -->
+  <section class="sec" id="s06">
+    <div class="sh">
+      <span class="num">06</span>
+      <div><h2>AI 自动完成 vs 用户确认（HITL · 条件触发）</h2><p>只回答一个问题：哪些责任在 AI，哪些边界永远留给用户</p></div>
+    </div>
+
+    <div class="ruleband">
+      <span class="rtg">CORE RULE</span>
+      <p>AI 负责筛选、验证和解释信息；用户保留最终投资决策权。</p>
+      <span class="pill amber" style="margin-left:auto;">黄金分工线</span>
+    </div>
+
+    <div class="split">
+      <div class="colbox auto">
+        <h3><span class="pill blue">AI 自动完成 · 整条主链路</span></h3>
+        <ul class="li auto">
+          <li>信息获取：行情 / 公告 / 新闻等多源拉取</li>
+          <li>噪声过滤：去重 · 相关 · 增量 · 信源 · 时效（不按观点过滤）</li>
+          <li>事实验证 / Source Grounding：交叉核对 + 按证据分级引用</li>
+          <li>Materiality 排序：只对已验证信号判断重要性</li>
+          <li>影响分析与六段式解释输出</li>
+          <li>全程可复核：结论始终绑定证据链</li>
+        </ul>
+      </div>
+
+      <div class="colbox usr">
+        <h3><span class="pill amber">用户保留的节点（仅条件触发）</span></h3>
+        <ul class="li usr">
+          <li>范围澄清：标的 / 时间范围 / 问题边界歧义时确认一次<span class="tag">HITL ① · 仅歧义</span>
+            <small>明确则直接继续，不打断自动链路</small></li>
+          <li>决策边界：被索要“买 / 卖 / 上车”时，切 Decision Support —— 确认关注周期与风险因素，只给 Scenario / 条件 / 观察指标<span class="tag">HITL ② · 仅交易决策请求</span>
+            <small>只会发生在首次分析输出之后</small></li>
+          <li>最终投资决策与执行<span class="warn">永远是用户</span>
+            <small>AI 提供解释与决策输入，不做决定与动作</small></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 Scope ============ -->
+  <section class="sec" id="s07">
+    <div class="sh">
+      <span class="num">07</span>
+      <div><h2>MVP In Scope / Out of Scope</h2><p>一期只做一件窄而深的事：单只自选股 × 单次事件 × 一次解释型问答</p></div>
+    </div>
+
+    <div class="scope">
+      <div class="sc-card in">
+        <h3><span class="pill green">IN · MVP 范围内</span></h3>
+        <ul class="li in">
+          <li><b>使用形态</b>：单只自选股 × 单次事件 / 行情波动 × 一次解释型问答</li>
+          <li><b>信息源</b>：行情、公告、新闻等已接入数据，Agent 自动获取</li>
+          <li><b>输出</b>：六段式解释（What Happened → … → What to Watch）</li>
+          <li><b>条件 HITL</b>：仅歧义或索要交易决策时打断；正常问答全自动</li>
+          <li><b>质量底线</b>：事实绑定 Source；反方观点不过滤；未来只给 Scenario</li>
+        </ul>
+        <div class="def-zone"><b>“发现机会”在 MVP 中的定义：</b>在用户已有自选股中识别可能构成机会或风险的重大新 Signal ——
+          而不是推荐用户去购买新的股票。</div>
+      </div>
+
+      <div class="sc-card out">
+        <h3><span class="pill gray">OUT · 明确不做</span></h3>
+        <ul class="li out">
+          <li>Buy / Sell 自动建议</li>
+          <li>股票评分</li>
+          <li>目标价预测</li>
+          <li>自动交易 / 执行</li>
+          <li>收益率预测</li>
+          <li>Portfolio Optimization（组合优化）</li>
+          <li>全市场自动选股</li>
+          <li>确定性预测未来涨跌</li>
+        </ul>
+        <div class="no-more"><b>处理方式：</b>用户话术命中以上任一项 → 不硬答，转入 Decision Support，只给情景 / 条件 / 观察指标。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 08 成立依据 ============ -->
+  <section class="sec" id="s08">
+    <div class="sh">
+      <span class="num">08</span>
+      <div><h2>产品是否成立的判断依据</h2><p>一句话假设 + 一条总判断 + 可证伪的检验维度</p></div>
+    </div>
+
+    <div class="stmt" style="margin-bottom:14px;">
+      <div class="lab">VALIDATION HYPOTHESIS · 核心验证假设</div>
+      <div class="big">SignalLens 能否在 <span class="hlb">不降低事实准确性</span>、<span class="hlb">不增加用户对 AI 投资判断的过度依赖</span> 的前提下，
+        帮普通投资者<span class="hl">更快识别真正影响其自选股的重要信息</span>，并<span class="hl">理解这些信息的影响</span>。</div>
+    </div>
+
+    <div class="stmt" style="margin-bottom:14px;background:linear-gradient(150deg,#fff,#f3f8ff);">
+      <div class="lab">TOTAL GATE · 总判断</div>
+      <div class="big">效率提升是收益，<span class="hl">可信与安全是上线 Gate</span> —— 产品成立必须同时满足 <span class="hlb">有用 + 可信 + 不越界</span>。</div>
+      <p class="subline">即使结论来得更快，只要出现以下任一情况：<span class="ko">关键事实准确性下降</span>、
+        <span class="ko">用户更难区分事实与推断</span>、<span class="ko">越来越依赖 AI 完成交易判断</span>、
+        <span class="ko">或系统出现直接 Buy/Sell 越界</span> —— 产品假设仍然不成立。详细量化阈值交给 <b>03_evaluation.html</b>。</p>
+    </div>
+
+    <table class="metric">
+      <tbody><tr><th style="width:14%;">观察维度</th><th style="width:43%;">成立信号</th><th>证伪信号</th></tr>
+      <tr><td class="dim">识别效率</td><td><span class="ok">✓</span> 从信息淹没到说出关键信号，用时明显缩短</td><td><span class="ko">✕</span> 仍需逐条翻资讯，与自行搜索无差异</td></tr>
+      <tr><td class="dim">事实质量</td><td><span class="ok">✓</span> 关键事实可回溯 Source、无硬伤</td><td><span class="ko">✕</span> 解释引入新的事实错误或不可考来源</td></tr>
+      <tr><td class="dim">理解而非依赖</td><td><span class="ok">✓</span> 能复述“为什么影响 / 哪些是推断”，而非只抄结论</td><td><span class="ko">✕</span> 只看结论跳过解释，或把 Scenario 当预测</td></tr>
+      <tr><td class="dim">安全边界</td><td><span class="ok">✓</span> 长期使用仍自主决策，从不越界给 Buy/Sell</td><td><span class="ko">✕</span> 依赖加深或出现越界输出 → 立即触发条件门纠偏</td></tr>
+    </tbody></table>
+
+    <div class="safe">
+      <span class="sl">四条安全原则贯穿</span>
+      <span class="s"><i>1</i>事实与分析明确分层</span>
+      <span class="s"><i>2</i>关键事实绑定 Source</span>
+      <span class="s"><i>3</i>对未来只表达 Scenario / Uncertainty</span>
+      <span class="s"><i>4</i>不输出直接 Buy / Sell 指令</span>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p class="f1">SignalLens · AI 投研助手 — 产品方案 · 交付物 01 / 03</p>
+  <p>与 02_demo、03_evaluation 共用同一份产品定义（核心用户 / 场景 / 边界 / HITL / 验证逻辑），无任何范围外延伸。</p>
+  <p style="margin-top:4px;opacity:.75;">产品定义唯一来源：CODEBUDDY.md</p>
+</footer>
+
+
+
+</body></html>

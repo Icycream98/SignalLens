@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<!-- saved from url=(0048)http://localhost:8909/bonus_transferability.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SignalLens · Bonus — From Stock Signals to Fund Insights（迁移分析）</title>
+<style>
+  /* ============ Design Tokens（与 01 / 02 / 03 统一蓝白体系） ============ */
+  :root{
+    --bg:#F5F8FE; --surface:#FFFFFF;
+    --ink:#0B1B33; --ink2:#1E3352; --muted:#5D7090; --faint:#8FA1C0;
+    --line:#E3EAF6; --line-soft:#EDF2FB;
+    --blue:#2E6BFF; --blue-deep:#1549D2; --blue-soft:#EAF1FF; --blue-mist:#F4F8FF; --sky:#8FB9FF;
+    --amber:#E8830C; --amber-deep:#B46308; --amber-soft:#FFF4E2; --amber-bd:#F3DDB0;
+    --red:#DE4B4B; --red-soft:#FDECEC; --red-bd:#F5CFCF;
+    --green:#1E9E6A; --green-soft:#E8F7F0; --green-bd:#BCE3D2;
+    --shadow:0 8px 22px rgba(15,40,90,.07);
+    --r:16px; --r-sm:11px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--ink);
+    font-size:13.5px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .bg-deco{position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(1000px 460px at 10% -10%, rgba(46,107,255,.10), transparent 60%),
+      radial-gradient(820px 380px at 94% 4%, rgba(143,185,255,.12), transparent 60%),
+      var(--bg);
+  }
+  .en{font-variant-numeric:tabular-nums}
+
+  /* ============ Top Bar ============ */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    display:flex;align-items:center;gap:10px;
+    height:50px;padding:0 24px;
+    background:rgba(255,255,255,.9);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:9px;flex:0 0 auto}
+  .logo{
+    width:26px;height:26px;border-radius:8px;flex:0 0 auto;
+    background:linear-gradient(135deg,#4D8BFF,#1549D2);
+    display:grid;place-items:center;color:#fff;
+    box-shadow:0 4px 10px rgba(46,107,255,.35);
+  }
+  .brand-name{font-weight:800;font-size:14.5px;color:var(--ink)}
+  .brand-name em{font-style:normal;color:var(--blue)}
+  .brand-tag{font-size:10.5px;color:var(--muted);background:var(--blue-mist);border:1px solid var(--line);padding:1px 8px;border-radius:99px}
+  .top-note{margin-left:auto;display:flex;align-items:center;gap:7px;flex:0 0 auto;
+    font-size:10.5px;color:var(--blue-deep);font-weight:700;white-space:nowrap;
+    background:var(--blue-soft);border:1px solid #D5E3FF;padding:4px 10px;border-radius:99px}
+  .top-note i{font-style:normal;font-weight:900;color:#fff;background:var(--blue);border-radius:5px;padding:0 5px;font-size:9.5px}
+
+  /* ============ Layout Shell ============ */
+  .wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+
+  /* ============ Hero ============ */
+  .hero{
+    background:linear-gradient(120deg,#0B1B33 0%,#10306B 55%,#1549D2 125%);
+    color:#fff;border-radius:0 0 24px 24px;position:relative;overflow:hidden;
+  }
+  .hero:before{content:"";position:absolute;right:-110px;top:-140px;width:380px;height:380px;border-radius:50%;
+    background:radial-gradient(circle,rgba(143,185,255,.30),transparent 65%)}
+  .hero:after{content:"";position:absolute;left:52%;bottom:-160px;width:320px;height:320px;border-radius:50%;
+    background:radial-gradient(circle,rgba(143,185,255,.14),transparent 65%)}
+  .hero-in{position:relative;z-index:2;padding:26px 0 24px}
+  .kicker{display:flex;align-items:center;gap:9px}
+  .kicker .ln{width:26px;height:2px;background:linear-gradient(90deg,#8FB9FF,transparent)}
+  .kicker span{font-size:10.5px;font-weight:800;letter-spacing:.2em;color:#9FC0FF;text-transform:uppercase}
+  .kicker .sep{opacity:.5;font-weight:400;letter-spacing:.1em}
+  h1{font-size:clamp(24px,2.5vw,33px);font-weight:900;letter-spacing:-.01em;line-height:1.18;margin:12px 0 2px}
+  h1 .en-line{display:block;color:#fff;font-size:clamp(19px,1.9vw,25px);font-weight:900;letter-spacing:.01em}
+  h1 .grad{background:linear-gradient(90deg,#fff,#A8C6FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1 .zh-sub{font-size:clamp(13px,1.3vw,16px);font-weight:600;color:#C9DAFA;display:block;margin-top:6px;letter-spacing:.01em}
+  h1 .zh-sub b{color:#fff;font-weight:800}
+  .subline{position:relative;z-index:2;display:flex;align-items:flex-start;gap:10px;margin-top:14px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.20);border-radius:12px;padding:10px 14px;max-width:920px}
+  .subline .ic{flex:0 0 auto;width:22px;height:22px;border-radius:7px;background:rgba(46,107,255,.55);display:grid;place-items:center;font-size:12px;font-weight:900;color:#fff;margin-top:1px}
+  .subline p{font-size:14.5px;color:#E3ECFF;line-height:1.6;font-weight:600}
+  .subline p em{font-style:normal;color:#9FC0FF}
+  .subline p b{color:#fff;font-weight:800;white-space:nowrap}
+  .subline p .warn-hi{color:#FFD9A0;font-weight:800}
+
+  /* 迁移地图 */
+  .map{position:relative;z-index:2;display:flex;align-items:stretch;gap:6px;margin-top:18px}
+  .node{
+    flex:1;min-width:0;border-radius:12px;padding:10px 12px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(143,185,255,.35);
+    display:flex;flex-direction:column;gap:4px;
+  }
+  .node .nt{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .node .n-en{font-size:9px;font-weight:900;letter-spacing:.14em;color:#8EC5FF;text-transform:uppercase}
+  .node .n-en.f{color:#7FE0B5}
+  .node .n-zh{font-size:15px;font-weight:800;color:#fff;line-height:1.2}
+  .node p{font-size:11px;color:#C2D3F4;line-height:1.45}
+  .node p b{color:#fff;font-weight:700}
+  .node .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto;padding-top:3px}
+  .node .chips span{font-size:9px;font-weight:700;color:#DCE8FF;background:rgba(255,255,255,.10);
+    border:1px solid rgba(143,185,255,.35);border-radius:99px;padding:1px 7px}
+  .node.harness{background:linear-gradient(160deg,rgba(46,107,255,.34),rgba(11,27,51,.6));border-color:rgba(143,185,255,.55)}
+  .node.harness .n-zh{font-size:14px}
+  .node.gate{
+    background:rgba(232,131,12,.16);border:1px dashed rgba(255,190,90,.75);
+  }
+  .node.gate .n-en{color:#FFD9A0}
+  .node.gate .n-zh{color:#FFE4B8}
+  .node.gate p{color:#F4D9AC}
+  .node.gate .chips span{color:#FFE9C4;border-color:rgba(255,190,90,.5);background:rgba(232,131,12,.15)}
+  .node.fund{background:rgba(255,255,255,.08);border-color:rgba(143,185,255,.6)}
+  .node.fund .n-zh{color:#fff}
+  .narrow{flex:0 0 24px;display:flex;align-items:center;justify-content:center;color:#7FA6F5;font-weight:900;font-size:15px}
+  .mapnote{position:relative;z-index:2;margin-top:12px;font-size:11.5px;color:#B9CEF5;line-height:1.55}
+  .mapnote b{color:#fff;font-weight:800}
+  .mapnote .hl{color:#FFD9A0;font-weight:800}
+
+  /* ============ Core Judgement ============ */
+  .core{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:16px 22px 14px;margin-top:16px;position:relative;
+  }
+  .core:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:16px 0 0 16px;background:linear-gradient(180deg,#2E6BFF,#1549D2)}
+  .core .lbl{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:900;letter-spacing:.18em;color:var(--blue);margin-bottom:7px}
+  .core .lbl:before{content:"";width:22px;height:2px;background:var(--blue)}
+  .core .big{font-size:clamp(15px,1.45vw,18.5px);font-weight:700;line-height:1.75;color:var(--ink)}
+  .core .big .qa{color:var(--blue-deep)}
+  .core .big .five{font-weight:900;color:var(--blue-deep);background:var(--blue-soft);border:1px solid #D5E3FF;border-radius:6px;padding:0 4px}
+  .core .foot{margin-top:8px;font-size:11.5px;color:var(--muted)}
+
+  /* ============ 通用小元素 ============ */
+  .pane{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:15px 18px;box-shadow:var(--shadow)}
+  .pane-h{display:flex;align-items:flex-start;gap:10px;margin-bottom:4px}
+  .pane-h .tile{flex:0 0 auto;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:16px;font-weight:900}
+  .pane-h h2{font-size:16px;font-weight:900;letter-spacing:.01em;line-height:1.25}
+  .pane-h h2 small{display:block;font-size:11px;font-weight:800;letter-spacing:.14em;margin-top:1px}
+  .pane-h p{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.5}
+  .en-note{font-size:10px;font-weight:800;letter-spacing:.1em;margin-left:auto;flex:0 0 auto;border-radius:99px;padding:2px 9px;white-space:nowrap}
+  .pane-r h2 small{color:var(--green)}
+  .pane-r .en-note{color:var(--green);background:var(--green-soft);border:1px solid var(--green-bd)}
+  .pane-d h2 small{color:var(--amber-deep)}
+  .pane-d .en-note{color:var(--amber-deep);background:var(--amber-soft);border:1px solid var(--amber-bd)}
+
+  /* ============ 左右结构：左 32% Framework Sidebar / 右 68% 主体 ============ */
+  .duo{display:grid;grid-template-columns:32.5% minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+  .duo>*{min-width:0}
+  .lcol{min-width:0}
+  .lcol .pane-r{position:static}
+  .lcol .case-bd{grid-template-columns:1fr}
+  .lcol .b-grid{grid-template-columns:1fr}
+  .pane-r{border-top:3px solid var(--green)}
+  .pane-r .tile{background:var(--green-soft);color:var(--green);border:1px solid var(--green-bd)}
+  .note-strip{display:flex;gap:8px;align-items:flex-start;background:var(--green-soft);border:1px solid var(--green-bd);
+    border-radius:10px;padding:7px 11px;font-size:11px;color:#2E5B46;line-height:1.5;margin-top:9px}
+  .note-strip b{color:var(--green);font-weight:900}
+  .ru-list{list-style:none;margin-top:7px;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .ru{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:7px 9px;background:linear-gradient(180deg,#FDFEFF,var(--blue-mist))}
+  .ru .ix{flex:0 0 auto;width:22px;height:22px;border-radius:7px;background:var(--blue-soft);border:1px solid #D5E3FF;color:var(--blue-deep);
+    font-size:10.5px;font-weight:900;display:grid;place-items:center}
+  .ru .tx b{font-size:12px;font-weight:900;color:var(--ink);line-height:1.3;display:block}
+  .ru .tx b small{font-size:10px;color:var(--faint);font-weight:700;margin-left:3px}
+  .ru .tx p{font-size:10.5px;color:var(--muted);line-height:1.45;margin-top:1px}
+  .pane-r .caveat{display:flex;gap:8px;align-items:flex-start;margin-top:10px;background:var(--blue-mist);
+    border:1px dashed #C9DAFB;border-radius:10px;padding:8px 12px;font-size:11.5px;color:var(--ink2);line-height:1.55}
+  .pane-r .caveat b{color:var(--blue-deep)}
+  .pane-r .caveat .ar{flex:0 0 auto;font-weight:900;color:var(--amber)}
+
+  /* ============ 右栏 · 5 个假设 ============ */
+  .pane-d{border-top:3px solid var(--amber)}
+  .pane-d .tile{background:var(--amber-soft);color:var(--amber-deep);border:1px solid var(--amber-bd)}
+  .pane-d .sec-lead{margin-top:6px;font-size:11.5px;color:var(--muted);line-height:1.55;display:flex;gap:6px}
+  .pane-d .sec-lead b{color:var(--amber-deep)}
+
+  .ass{position:relative;border:1px solid var(--line);border-radius:12px;margin-top:9px;padding:10px 12px 9px;background:#fff}
+  .ass .at{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ass .anum{flex:0 0 auto;width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,#E8830C,#B46308);color:#fff;
+    font-size:12px;font-weight:900;display:grid;place-items:center}
+  .ass .aname{font-size:14px;font-weight:900;letter-spacing:.02em;color:var(--ink)}
+  .ass .aname small{font-size:11px;font-weight:700;color:var(--amber-deep);margin-left:6px}
+  .ass .a-q{margin-left:auto;flex:0 0 auto;font-size:10px;font-weight:800;color:var(--amber-deep);
+    background:var(--amber-soft);border:1px solid var(--amber-bd);border-radius:99px;padding:1px 9px;white-space:nowrap}
+  .ab{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:7px}
+  .ab .side{border-radius:9px;padding:6px 9px;min-width:0}
+  .ab .side.stock{background:var(--blue-mist);border:1px solid #D8E4F8}
+  .ab .side.fund{background:var(--amber-soft);border:1px solid var(--amber-bd)}
+  .ab .sl{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.08em;border-radius:5px;padding:1px 7px;margin-bottom:4px}
+  .ab .stock .sl{color:var(--blue-deep);background:#fff;border:1px solid #CFDDF5}
+  .ab .fund .sl{color:var(--amber-deep);background:#fff;border:1px solid var(--amber-bd)}
+  .ab .side p{font-size:11px;color:var(--ink2);line-height:1.5}
+  .ab .side p b{color:var(--ink)}
+  .ab .side ul.f{list-style:none;display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+  .ab .side ul.f li{font-size:10px;font-weight:700;color:#6b4a12;background:#fff;border:1px solid var(--amber-bd);border-radius:6px;padding:1px 7px;line-height:1.5}
+  .ab .side ul.f.f2c{display:grid;grid-template-columns:1fr 1fr;gap:4px 6px;margin-top:2px}
+
+  /* 原生文字列表（Assumption 卡内 .side 直栏，未套用 chips 样式）：修正 marker 溢出卡片左边界 */
+  .ass > .side > ul{margin:6px 0 6px 0;padding:0 0 0 22px;list-style:disc outside}
+  .ass > .side > ul > li{margin:3px 0;line-height:1.55;overflow-wrap:break-word;word-break:normal;min-width:0}
+
+  .aconc{margin-top:7px;display:flex;gap:8px;align-items:flex-start;background:linear-gradient(120deg,#fff,#F7FAFF);
+    border:1px dashed #C9DAFB;border-radius:9px;padding:6px 10px;font-size:11px;color:var(--ink2);line-height:1.55}
+  .aconc .ck{flex:0 0 auto;font-weight:900;color:var(--amber);margin-top:0}
+  .aconc b{color:var(--ink)}
+  .aconc .hl{color:var(--amber-deep);font-weight:900}
+  .aconc.red{background:linear-gradient(120deg,#fff,var(--red-soft));border-color:var(--red-bd)}
+  .aconc.red b{color:var(--red)}
+
+  .gline{margin-top:9px;background:var(--amber-soft);border:1px solid var(--amber-bd);border-left:4px solid var(--amber);border-radius:9px;padding:7px 11px;font-size:11.5px;color:#5c4313;line-height:1.6}
+  .gline b{color:var(--amber-deep)}
+  .chips2{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+  .chips2 span{font-size:10px;font-weight:700;color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:7px;padding:2px 8px;line-height:1.5}
+  .chips2 span.nw{color:var(--blue-deep);background:var(--blue-soft);border-color:#D5E3FF}
+
+  /* 路径行 */
+  .path{display:flex;align-items:stretch;flex-wrap:wrap;gap:5px;margin-top:5px}
+  .pstep{flex:1 1 130px;min-width:0;font-size:10px;font-weight:800;color:var(--ink2);background:#fff;border:1px solid var(--line);
+    border-radius:7px;padding:4px 8px;line-height:1.4}
+  .pstep i{display:block;font-style:normal;font-size:9px;color:var(--faint);font-weight:700;letter-spacing:.04em}
+  .path .par{display:flex;align-items:center;justify-content:center;color:var(--sky);font-weight:900;font-size:12px;padding:0 1px}
+  .path.end .pstep{background:linear-gradient(180deg,#fff,#EFF5FF);border-color:#C9DAFB;color:var(--blue-deep)}
+  .path.end .pstep i{color:var(--sky)}
+
+  /* ============ Case ============ */
+  .case{background:var(--surface);border:1px solid var(--line);border-radius:18px;margin-top:18px;overflow:hidden;box-shadow:var(--shadow)}
+  .case-hd{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(120deg,#0B1B33,#10306B);
+    color:#fff;padding:12px 20px}
+  .case-hd .tag3{flex:0 0 auto;font-size:9.5px;font-weight:900;letter-spacing:.12em;color:#0B1B33;background:#FFD9A0;
+    border-radius:99px;padding:2px 10px}
+  .case-hd h3{font-size:16.5px;font-weight:900}
+  .case-hd h3 small{display:block;font-size:11px;color:#B9CEF5;font-weight:700;margin-top:1px}
+  .case-bd{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px 20px 4px}
+  .case-side{border:1px solid var(--line);border-radius:13px;padding:11px 13px;background:linear-gradient(180deg,#FDFEFF,#F7FAFF)}
+  .case-side.stock{border-top:3px solid var(--blue)}
+  .case-side.fund{border-top:3px solid var(--amber)}
+  .case-side .hd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+  .case-side .hd .pill{font-size:9px;font-weight:900;letter-spacing:.12em;border-radius:99px;padding:2px 9px}
+  .case-side.stock .hd .pill{color:#fff;background:var(--blue)}
+  .case-side.fund .hd .pill{color:#fff;background:var(--amber)}
+  .case-side .hd b{font-size:14px;font-weight:900;color:var(--ink)}
+  .case-side .who{font-size:10.5px;color:var(--faint);font-weight:700}
+  .c-chain{display:flex;flex-direction:column;gap:4px;margin-top:7px}
+  .c-row{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink2);line-height:1.4}
+  .c-row .dotx{flex:0 0 auto;width:20px;height:20px;border-radius:7px;background:var(--blue-soft);border:1px solid #D5E3FF;
+    color:var(--blue-deep);font-size:10px;font-weight:900;display:grid;place-items:center}
+  .c-row .arr{color:var(--faint);font-weight:900;font-size:11px}
+  .c-row b{color:var(--ink)}
+  .c-end{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .c-badge{font-size:10px;font-weight:900;letter-spacing:.05em;border-radius:7px;padding:3px 9px}
+  .case-side.stock .c-badge{color:#1a5fae;background:var(--blue-soft);border:1px solid #C9DAFB}
+  .case-side.fund .c-badge{color:var(--amber-deep);background:var(--amber-soft);border:1px solid var(--amber-bd)}
+  .c-note{margin-top:6px;font-size:10px;color:var(--faint);line-height:1.5;border-top:1px dashed var(--line);padding-top:5px}
+  .case-side.fund .c-row .dotx{background:var(--amber-soft);border-color:var(--amber-bd);color:var(--amber-deep)}
+  .mock{margin:10px 20px 12px;border-radius:12px;background:linear-gradient(120deg,#FFF6E8,#FFFDF6);border:1px solid var(--amber-bd);
+    padding:10px 15px;display:flex;gap:10px;align-items:flex-start}
+  .mock .mk{flex:0 0 auto;font-size:9px;font-weight:900;letter-spacing:.1em;color:#fff;background:var(--amber);
+    border-radius:6px;padding:2px 8px;margin-top:1px}
+  .mock p{font-size:12px;color:#5c4313;line-height:1.6}
+  .mock p b{color:var(--amber-deep)}
+  .mock .num-hi{display:inline-block;font-weight:900;font-size:13px;color:#fff;background:var(--amber);border-radius:6px;padding:0 7px;margin:0 2px}
+  .take{display:flex;align-items:center;justify-content:center;gap:4px 10px;flex-wrap:wrap;background:linear-gradient(120deg,#0B1B33,#1549D2);
+    color:#fff;padding:10px 20px;font-size:15px;font-weight:900;letter-spacing:.02em;text-align:center}
+  .take em{font-style:normal;color:#8EC5FF}
+  .take .hi{color:#FFD9A0}
+
+  /* ============ Bottom ============ */
+  .bottom{margin-top:18px;background:linear-gradient(120deg,#0B1B33 0%,#10306B 60%,#1549D2 125%);border-radius:18px;
+    padding:16px 22px 14px;color:#fff;position:relative;overflow:hidden}
+  .bottom:before{content:"";position:absolute;right:-80px;top:-120px;width:300px;height:300px;border-radius:50%;
+    background:radial-gradient(circle,rgba(143,185,255,.22),transparent 65%)}
+  .b-grid{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .b-box{border-radius:12px;padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.18)}
+  .b-box.reuse{border-color:rgba(140,220,185,.4)}
+  .b-box.redef{border-color:rgba(255,200,120,.5)}
+  .b-box .bl{font-size:10px;font-weight:900;letter-spacing:.16em;margin-bottom:6px;display:flex;align-items:center;gap:7px}
+  .b-box.reuse .bl{color:#7FE0B5}
+  .b-box.redef .bl{color:#FFD9A0}
+  .b-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .b-tags span{font-size:12px;font-weight:800;letter-spacing:.02em;border-radius:8px;padding:3px 12px;background:rgba(255,255,255,.09);
+    border:1px solid rgba(255,255,255,.22)}
+  .b-box.reuse .b-tags span{color:#D8F6E7}
+  .b-box.redef .b-tags span{color:#FFE9C8}
+  .b-tags span.cut{color:#C4D5F3;text-decoration:line-through;text-decoration-color:#F08080;background:rgba(255,255,255,.05);font-weight:600}
+  .b-final{position:relative;z-index:2;margin-top:13px;border-top:1px dashed rgba(255,255,255,.22);padding-top:11px;text-align:center}
+  .b-final p{font-size:clamp(13.5px,1.4vw,17px);font-weight:900;line-height:1.7;letter-spacing:.02em}
+  .b-final p em{font-style:normal;color:#8EC5FF}
+  .b-final p .h1{color:#FFE9C8;font-weight:900}
+  .b-final .src{font-size:10px;color:#9DB6DF;margin-top:5px;font-weight:600}
+
+  footer{margin:18px auto 0;max-width:1240px;padding:0 28px 22px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;color:#9AA9C2;font-size:10.5px}
+  .f-tags{display:flex;gap:6px;flex-wrap:wrap}
+  .f-tags span{background:#fff;border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-weight:700}
+  .f-note{line-height:1.6}
+  .f-note b{color:var(--muted)}
+
+  /* ============ Responsive ============ */
+  @media (max-width:1060px){
+    .duo{grid-template-columns:1fr}
+    .lcol .pane-r{position:static}
+    .lcol .b-grid{grid-template-columns:1fr 1fr}
+    .map{flex-wrap:wrap}
+    .node{flex:1 1 46%}
+    .narrow{transform:rotate(90deg);flex:0 0 18px;height:18px}
+    .case-bd{grid-template-columns:1fr}
+  }
+  @media (max-width:760px){
+    .wrap{padding:0 16px}
+    .top-note{display:none}
+    .ru-list{grid-template-columns:1fr}
+    .ab{grid-template-columns:1fr}
+    .b-grid{grid-template-columns:1fr}
+    .lcol .b-grid{grid-template-columns:1fr}
+    footer{padding:0 16px 18px}
+  }
+  @media (max-width:560px){
+    .node{flex:1 1 100%}
+    .narrow{display:none}
+    .case-hd{padding:10px 14px}
+    .case-bd{padding:12px 14px 2px}
+    .mock{margin:8px 14px 10px}
+    .core{padding:14px 16px}
+  }
+</style>
+</head>
+<body>
+<div class="bg-deco"></div>
+
+<!-- ============ Top Bar ============ -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M3 13h4l2.5-7 4 11 2.5-6H21" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+    <div class="brand-name">Signal<em>Lens</em></div>
+    <div class="brand-tag">AI 投研助手</div>
+  </div>
+  </header>
+
+<!-- ============ Hero · 顶部：迁移判断 ============ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-in">
+      <div class="kicker"><span class="ln"></span><span>Transferability Analysis</span><span class="sep">·</span><span>Bonus Deliverable</span></div>
+
+      <h1>
+        <span class="en-line">From <span class="grad">Stock Signals</span> to <span class="grad">Fund Insights</span></span>
+        <span class="zh-sub">哪些能力<b>可复用</b>，哪些假设<b style="color:#FFD9A0;">必须重新定义？</b></span>
+      </h1>
+
+      <div class="subline">
+        <span class="ic">“</span>
+        <p><em>Harness 可复用，Domain Assumptions 不可直接复制。</em><br>
+        SignalLens 的迁移，不是把“个股判断规则”换成“基金判断规则”，
+        而是复用一套 <b>过滤 → 验证 → 解释</b> 的 Agent 方法 —— 但进入基金场景前，<span class="warn-hi">5 个 Domain Assumptions 必须逐条重验</span>。</p>
+      </div>
+
+      <!-- 迁移地图 -->
+      <div class="map">
+        <div class="node">
+          <div class="nt"><span class="n-en">A · NOW</span></div>
+          <div class="n-zh">个股 SignalLens</div>
+          <p>对象：<b>单家公司</b><br>公司级事件解析 · 六段式解释</p>
+          <div class="chips"><span>行情</span><span>公告</span><span>新闻</span></div>
+        </div>
+        <div class="narrow">→</div>
+
+        <div class="node harness">
+          <div class="nt"><span class="n-en f">B · REUSABLE</span></div>
+          <div class="n-zh">Reusable Agent Harness</div>
+          <p>对象无关的<b>方法层</b>：怎么获取、怎么去重、怎么验证、怎么解释</p>
+          <div class="chips"><span>过滤</span><span>验证</span><span>解释</span></div>
+        </div>
+        <div class="narrow">→</div>
+
+        <div class="node gate">
+          <div class="nt"><span class="n-en">⚠ GATE · MUST REVALIDATE</span></div>
+          <div class="n-zh">Domain Assumptions<br>must be revalidated</div>
+          <p>Materiality · Impact Path · Ground Truth<br>Time Horizon · Evaluation</p>
+          <div class="chips"><span>不能直接照搬</span><span>逐条重定义</span></div>
+        </div>
+        <div class="narrow">→</div>
+
+        <div class="node fund">
+          <div class="nt"><span class="n-en">C · NEXT</span></div>
+          <div class="n-zh">基金解读</div>
+          <p>对象：<b>组合 + 策略</b><br>持仓 / 风格归因 · NAV / 相对业绩</p>
+          <div class="chips"><span>持仓披露</span><span>净值</span><span>Benchmark</span><span>风格暴露</span></div>
+        </div>
+      </div>
+
+      <p class="mapnote">这不是“把数据源从股价换成净值”就能完成的迁移 —— 卡点不在数据层，而在语义层：
+      <b>“什么算重要”“事件如何传导”“事实是什么”“用户在问什么”“怎样算答对”</b>，都会随分析对象改变。<span class="hl">中间那道 Gate 才是迁移的真正成本。</span></p>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+
+  <!-- ============ 核心判断 ============ -->
+  <div class="core">
+    <div class="lbl">CORE JUDGEMENT · 本页唯一要记住的结论</div>
+    <div class="big">“可迁移的<span class="qa">不是一套固定的个股判断规则</span>，而是一套
+      <span class="five">过滤 → 验证 → 解释</span> 的 Agent 方法。
+      当分析对象从个股变成基金时，
+      <span class="five">Materiality</span> · <span class="five">Impact Path</span> · <span class="five">Ground Truth</span> · <span class="five">Time Horizon</span> · <span class="five">Evaluation</span>
+      必须重新定义。”</div>
+    <div class="foot">判断规则是 Domain-specific 的；处理信息的 Agent Harness 是 Domain-agnostic 的。迁移判断的分界线，就在这两者之间。</div>
+  </div>
+
+  <!-- ============ 左右结构 ============ -->
+  <div class="duo">
+
+    <!-- ===== 左栏 · Framework Sidebar ===== -->
+    <div class="lcol">
+
+    <!-- Reusable Harness -->
+    <div class="pane pane-r">
+      <div class="pane-h">
+        <span class="tile">✓</span>
+        <div>
+          <h2>Reusable Harness<small>可复用的是“怎么处理信息”</small></h2>
+          <p>通用金融信息处理 + Agent 编排能力 —— 不依赖分析对象是个股还是基金。</p>
+        </div>
+        <span class="en-note">8 · 直接复用</span>
+      </div>
+
+      <div class="note-strip"><b>判定标准：</b>只要能力本身不读取“公司基本面 / 持仓结构”，就不需要重写 —— 这 8 项全部成立。</div>
+
+      <ul class="ru-list">
+        <li class="ru"><span class="ix">1</span><div class="tx"><b>Information Retrieval<small>信息获取</small></b><p>多源拉取与时效窗口；数据源可整体替换</p></div></li>
+        <li class="ru"><span class="ix">2</span><div class="tx"><b>Deduplication<small>去重</small></b><p>同一事件跨平台转载 / 转述的识别，通用</p></div></li>
+        <li class="ru"><span class="ix">3</span><div class="tx"><b>Relevance Filtering<small>相关过滤</small></b><p>以“对象 + 问题”为锚的噪音过滤框架</p></div></li>
+        <li class="ru"><span class="ix">4</span><div class="tx"><b>Source Grounding<small>来源绑定</small></b><p>关键事实绑定来源、证据分级引用</p></div></li>
+        <li class="ru"><span class="ix">5</span><div class="tx"><b>Source Conflict Handling<small>冲突处理</small></b><p>原始披露优先；未决冲突显式标注</p></div></li>
+        <li class="ru"><span class="ix">6</span><div class="tx"><b>Fact / Interpretation /<br>Uncertainty Separation<small>三层分离</small></b><p>事实 / 观点 / 推断分层表达，通用</p></div></li>
+        <li class="ru"><span class="ix">7</span><div class="tx"><b>HITL<small>用户参与</small></b><p>范围澄清 + 决策边界；决策权留在用户</p></div></li>
+        <li class="ru"><span class="ix">8</span><div class="tx"><b>Explainable Output<small>可解释输出</small></b><p>把证据链翻译成用户可读的解释结构</p></div></li>
+      </ul>
+
+      <div class="caveat"><span class="ar">→</span><div>这 8 项回答的都是<b>“信息怎么处理”</b>（抓什么 / 去重什么 / 信谁 / 怎么讲清），不是<b>“什么算重要”</b>——所以可整体搬运。
+      注意：<b>Materiality 排序与 Impact Path 不在复用清单内</b>，它们已被移到右侧“必须重新定义”。</div></div>
+    </div>
+
+    <!-- ===== Transfer Case Example · 收纳于左栏 ===== -->
+    <section class="case">
+      <div class="case-hd">
+        <span class="tag3">CASE · 3 秒读懂</span>
+        <h3>某上市公司发布利润预警<small>同一个事件，在两个对象上的 Materiality 完全不同 —— Materiality 是 Domain-specific 的。</small></h3>
+      </div>
+      <div class="case-bd">
+        <div class="case-side stock">
+          <div class="hd"><span class="pill">STOCK LENS</span><b>个股 SignalLens</b></div>
+          <div class="c-chain">
+            <div class="c-row"><span class="dotx">1</span><span><b>公司利润预警</b>（已披露事实）</span></div>
+            <div class="c-row"><span class="arr">↓</span><span>对公司盈利预期有<b>直接影响</b></span></div>
+            <div class="c-row"><span class="arr">↓</span><span>→ <span class="c-badge">High Materiality Signal</span></span></div>
+          </div>
+          <div class="c-note">对象就是公司本身 —— 无需再核对“谁持有它”，直接按公司级口径判定。</div>
+        </div>
+
+        <div class="case-side fund">
+          <div class="hd"><span class="pill">FUND LENS</span><b>基金解读</b></div>
+          <div class="c-chain">
+            <div class="c-row"><span class="dotx">1</span><span>利润预警 → <b>基金是否持有该资产？</b></span></div>
+            <div class="c-row"><span class="arr">↓</span><span>持有 → <b>权重多少？对 NAV 贡献多大？</b></span></div>
+            <div class="c-row"><span class="arr">↓</span><span>是否属于<b>核心行业 / Style / Factor 暴露？</b></span></div>
+            <div class="c-row"><span class="arr">↓</span><span>→ 再决定是否为 <span class="c-badge">Material Signal</span></span></div>
+          </div>
+          <div class="c-note">顺序不可省：先“组合暴露”，后“事件重要性”。</div>
+        </div>
+      </div>
+
+      <div class="mock">
+        <span class="mk">MOCK</span>
+        <p>若基金对该公司的持仓仅 <span class="num-hi">0.1%</span> —— 即使股价单日下跌 <span class="num-hi">20%</span>，
+        对基金净值的实际贡献也微乎其微，<b>可能不是基金层面的核心 Signal</b>；
+        但同一事件对“重仓该股”的个股用户，仍是 <b>High Materiality</b>。同一事件，两种判定 ——
+        因为<b>Materiality 的锚点不同</b>。</p>
+      </div>
+
+      <div class="take"><span>结论：</span><span class="hi">“Materiality 是 Domain-specific 的，不能直接迁移。”</span><em> —— 必须带着基金的“组合暴露”视角重新定义。</em></div>
+    </section>
+
+    <!-- ===== Final Takeaway · 收纳于左栏 ===== -->
+    <section class="bottom">
+      <div class="b-grid">
+        <div class="b-box reuse">
+          <div class="bl">✓ 可以复用 · REUSABLE</div>
+          <div class="b-tags"><span>Filtering</span><span>Verification</span><span>Explainability</span><span>HITL</span></div>
+        </div>
+        <div class="b-box redef">
+          <div class="bl">↻ 必须重新定义 · MUST REDEFINE</div>
+          <div class="b-tags"><span>Materiality</span><span>Impact Path</span><span>Ground Truth</span><span>Time Horizon</span><span>Evaluation</span></div>
+        </div>
+      </div>
+      <div class="b-final">
+        <p>“迁移能力来自通用 Agent Harness，<span class="h1">产品质量则取决于是否重新定义正确的 Domain Assumptions。</span>”</p>
+        <div class="src">From Stock Signals to Fund Insights · SignalLens Bonus Deliverable</div>
+      </div>
+    </section>
+
+    </div>
+
+    <!-- ===== 右栏：必须重新定义的 5 个假设（全页视觉重点） ===== -->
+    <div class="pane pane-d">
+      <div class="pane-h">
+        <span class="tile">5</span>
+        <div>
+          <h2>5 个 Domain Assumptions 必须重新定义<small>Domain Assumptions Must Be Revalidated</small></h2>
+          <p>迁移真正要重写的部分 —— 判定语义随分析对象改变；不重定义，质量会整体失效。</p>
+        </div>
+        <span class="en-note">5 · 不可直接复制</span>
+      </div>
+      <div class="sec-lead">同一套 Harness，把<b>“对象层假设”</b>从“单家公司”替换为“组合持仓 + 策略风格”时，以下五个判定必须逐条重建：</div>
+
+      <!-- 1 MATERIALITY -->
+      <div class="ass">
+        <div class="at"><span class="anum">1</span><span class="aname">MATERIALITY<small>重要性</small></span><span class="a-q">“什么才算重要？”</span></div>
+        <div class="ab">
+          <div class="side stock"><span class="sl">个股假设</span>
+            <p>事件是否实质影响<b>该公司业务 / 财务</b>及<b>市场预期</b> —— 公司级口径。</p>
+          </div>
+          <div class="side fund"><span class="sl">基金重定义</span>
+            <p>是否重要，必须结合：</p>
+            <ul class="f"><li>是否持有该资产</li><li>持仓权重</li><li>对 NAV 的潜在贡献</li><li>行业暴露</li><li>Style / Factor Exposure</li></ul>
+          </div>
+        </div>
+        <div class="aconc"><span class="ck">◆</span><div>同一个公司重大事件，对个股可能是 <b>High Materiality</b>；对基金<b>未必重要</b> —— 相关性锚点从“公司”移到“<span class="hl">组合对该资产的暴露</span>”。</div></div>
+      </div>
+
+      <!-- 2 IMPACT PATH -->
+      <div class="ass">
+        <div class="at"><span class="anum">2</span><span class="aname">IMPACT PATH<small>影响路径</small></span><span class="a-q">“事件如何传导？”</span></div>
+        <div class="side stock" style="margin-top:7px;"><span class="sl">个股路径</span>
+          <div class="path"><span class="pstep"><i>① EVENT</i>事件</span><span class="par">→</span><span class="pstep"><i>② 业务 / 财务</i>Company Business<br>/ Financials</span><span class="par">→</span><span class="pstep"><i>③ 市场预期</i>Market Expectation</span><span class="par">→</span><span class="pstep end"><i>④ 终点</i>Stock Impact</span></div>
+        </div>
+        <div class="side fund" style="margin-top:7px;"><span class="sl">基金路径</span>
+          <div class="path"><span class="pstep"><i>① EVENT</i>事件</span><span class="par">→</span><span class="pstep"><i>② 暴露</i>Holding / Sector<br>/ Factor</span><span class="par">→</span><span class="pstep"><i>③ 组合暴露</i>Portfolio Exposure</span><span class="par">→</span><span class="pstep end"><i>④ 终点</i>NAV / Relative<br>Performance</span></div>
+        </div>
+        <div class="aconc"><span class="ck">◆</span><div>不能把个股 Impact Path 直接复制到基金 —— 传导<b>终点不同</b>：个股止于<span class="hl">股价</span>，基金止于<span class="hl">净值与相对业绩</span>，中间多了一层“组合 / 风格暴露”。</div></div>
+      </div>
+
+      <!-- 3 GROUND TRUTH & DATA FRESHNESS -->
+      <div class="ass">
+        <div class="at"><span class="anum">3</span><span class="aname">GROUND TRUTH &amp; DATA FRESHNESS<small>事实底座与数据新鲜度</small></span><span class="a-q">“事实从哪里来、是否新鲜？”</span></div>
+        <div class="ab">
+          <div class="side stock"><span class="sl">个股事实底座（近乎实时）</span>
+            <p>实时行情 · 公司公告 —— 事件发生时基本可即时获取。</p>
+          </div>
+          <div class="side fund"><span class="sl">基金场景需要新的事实底座</span>
+            <p>关键事实来源变为披露制，天然滞后：</p>
+            <ul class="f f2c"><li>Fund Periodic Report</li><li>Holding Disclosure</li><li>NAV</li><li>Benchmark</li><li>Fund Manager Change</li><li>Sector Allocation</li><li>Style / Factor Exposure</li></ul>
+          </div>
+        </div>
+        <div class="gline"><b>Guardrail · 数据时点：</b>基金持仓披露通常存在滞后 —— <b>历史披露仓位不能直接表达为当前实时持仓</b>。若不知道当前真实持仓，必须明确标记<b>数据时点与不确定性</b>，不得把季报仓位当作“此刻仓位”陈述。</div>
+      </div>
+
+      <!-- 4 USER INTENT & TIME HORIZON -->
+      <div class="ass">
+        <div class="at"><span class="anum">4</span><span class="aname">USER INTENT &amp; TIME HORIZON<small>用户意图与时间尺度</small></span><span class="a-q">“用户在问什么、问多长周期？”</span></div>
+        <div class="ab">
+          <div class="side stock"><span class="sl">个股典型问题</span>
+            <p>“今天为什么跌？”</p>
+          </div>
+          <div class="side fund"><span class="sl">基金典型问题</span>
+            <p>“最近一个月为什么跑输 Benchmark？”<br>“这个季度基金风格是否发生变化？”<br>“净值波动主要来自哪些持仓？”</p>
+          </div>
+        </div>
+        <div class="chips2" style="margin-top:6px">
+          <span style="color:var(--blue-deep);background:var(--blue-soft);border-color:#D5E3FF">个股 → 事件驱动 · 短时效</span>
+          <span style="color:var(--amber-deep);background:var(--amber-soft);border-color:var(--amber-bd)">基金 → 阶段归因 · 组合暴露 · 中周期</span>
+        </div>
+        <div class="aconc"><span class="ck">◆</span><div>分析窗口与信息权重必须重新设计 —— 同一个“今天发生了什么”，在基金语境里要先回答“它在组合里占什么位置”。</div></div>
+      </div>
+
+      <!-- 5 EVALUATION GROUND TRUTH -->
+      <div class="ass">
+        <div class="at"><span class="anum">5</span><span class="aname">EVALUATION GROUND TRUTH<small>评测真值</small></span><span class="a-q">“怎样算答对了？”</span></div>
+        <div class="side stock" style="margin-top:7px;"><span class="sl">个股评测基线（公司事件真值）</span>
+          <p>Material Signal Recall · Precision · Fact Accuracy —— 对象是“公司级信号”。</p>
+        </div>
+        <div class="side fund" style="margin-top:7px;"><span class="sl">基金需新增 / 重新定义</span>
+          <ul class="f"><li>Material Holding Event Recall</li><li>NAV Attribution Accuracy</li><li>Holding / Sector Contribution Accuracy</li><li>Style Drift Detection Quality</li><li>Stale Holding Handling Accuracy</li><li>Citation / Source Accuracy</li></ul>
+        </div>
+        <div class="aconc red"><span class="ck">!</span><div><b>特别测试：</b>系统是否错误地把<b>“历史披露持仓”当成“当前实时仓位”</b> —— Stale Holding 是最典型的基金场景评测陷阱。</div></div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>
+</footer>
+
+
+
+</body></html>
