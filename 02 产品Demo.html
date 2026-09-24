@@ -446,7 +446,7 @@
 <main class="wrap">
 
   <!-- ============ Screen 1 · Watchlist / Ask ============ -->
-  <section class="screen hidden" id="screenAsk">
+  <section class="screen" id="screenAsk">
     <div class="page-head">
       <div class="eyebrow">Screen 1 · Watchlist / Ask</div>
       <h2 class="title">你的自选股今天发生了什么？</h2>
@@ -521,7 +521,7 @@
   </section>
 
   <!-- ============ Screen 2 · Agent Execution ============ -->
-  <section class="screen" id="screenAgent">
+  <section class="screen hidden" id="screenAgent">
     <div class="page-head">
       <div class="eyebrow">Screen 2 · Agent Execution</div>
       <h2 class="title">SignalLens Agent 正在执行分析计划</h2>
@@ -1469,6 +1469,8 @@ function enterDecision(q){
 
 /* ---------- init ---------- */
 document.addEventListener('DOMContentLoaded', function(){
+  goHome();
+
   var inp = document.getElementById('askInput');
   if(inp) inp.addEventListener('keydown', function(e){
     if(e.key==='Enter'){ e.preventDefault(); startAgent(); }
