@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)http://localhost:8000/02_demo.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SignalLens · AI 投研助手 — Interactive Demo</title>
+<style>
+  :root{
+    --blue:#2E6BFF; --blue-deep:#1549D2; --blue-soft:#EAF1FF; --blue-mist:#F4F8FF;
+    --line:#E2E9F5; --ink:#0F1D3A; --muted:#5D6D8C; --faint:#93A1BC;
+    --card:#FFFFFF; --bg:#EEF3FB;
+    --down:#E0444A; --down-soft:#FDEBEC;
+    --up:#0FA568; --up-soft:#E8F7F0;
+    --amber:#B45B0C; --amber-soft:#FFF3E0;
+    --violet:#6C3FD1; --violet-soft:#F2ECFD;
+    --shadow:0 10px 30px rgba(20,45,110,.08);
+    --r:14px; --r-sm:9px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--ink);
+    font-size:14px;line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer}
+  input,textarea{font-family:inherit}
+
+  .hidden{display:none !important}
+
+  /* ===== Header ===== */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .h-in{max-width:1120px;margin:0 auto;padding:11px 20px;display:flex;align-items:center;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+  .brand .logo{
+    width:34px;height:34px;border-radius:10px;flex:0 0 auto;
+    background:linear-gradient(135deg,#4D8BFF,#1549D2);
+    color:#fff;display:grid;place-items:center;font-weight:900;font-size:16px;
+    box-shadow:0 4px 10px rgba(46,107,255,.35);letter-spacing:-.5px;
+  }
+  .brand-name{font-size:16px;font-weight:800;letter-spacing:.2px}
+  .brand-name em{font-style:normal;color:var(--blue)}
+  .brand-tag{font-size:10.5px;color:var(--muted);background:var(--blue-mist);border:1px solid var(--line);padding:1px 8px;border-radius:99px;margin-left:2px}
+  .h-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .mock-pill{font-size:11px;font-weight:700;color:var(--blue-deep);background:var(--blue-soft);border:1px solid #D5E3FF;padding:3px 10px;border-radius:99px;white-space:nowrap}
+  .nav-btn{
+    border:1px solid var(--line);background:#fff;color:var(--ink);
+    padding:5px 13px;border-radius:99px;font-size:12.5px;font-weight:600;
+    transition:.15s;
+  }
+  .nav-btn:hover{background:var(--blue-soft);color:var(--blue-deep);border-color:#C9DAFB}
+
+  /* ===== Layout ===== */
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 20px 40px}
+  .screen{animation:fadein .35s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+
+  .eyebrow{font-size:12px;font-weight:800;color:var(--blue-deep);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+  .eyebrow::before{content:"";width:8px;height:8px;border-radius:2px;background:var(--blue);display:inline-block}
+  h2.title{font-size:25px;font-weight:800;letter-spacing:.2px;margin:8px 0 4px}
+  p.sub{color:var(--muted);font-size:13.5px}
+  .page-head{margin-bottom:20px}
+
+  /* ===== Screen 1 · Ask ===== */
+  .ask-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:18px;align-items:stretch}
+  @media(max-width:920px){.ask-grid{grid-template-columns:1fr}}
+  .watch-card{padding:18px}
+  .w-title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;margin-bottom:4px}
+  .w-title .dot{width:8px;height:8px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 4px rgba(46,107,255,.15)}
+  .w-hint{font-size:11.5px;color:var(--faint);margin-bottom:14px}
+  .watch-row{
+    display:flex;align-items:center;gap:10px;padding:12px 12px;border-radius:11px;
+    border:1px solid var(--line);margin-bottom:8px;background:#FDFEFF;
+  }
+  .watch-row.featured{background:linear-gradient(180deg,#FDFEFF,var(--blue-mist));border-color:#BFD3FF;box-shadow:0 0 0 1.5px rgba(46,107,255,.12)}
+  .w-sym{width:34px;height:34px;border-radius:9px;background:var(--blue-soft);color:var(--blue-deep);font-weight:900;font-size:13px;display:grid;place-items:center;flex:0 0 auto}
+  .w-id{flex:1;min-width:0}
+  .w-id b{display:block;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .w-id small{color:var(--faint);font-size:11.5px}
+  .chg{font-weight:900;font-size:14px;flex:0 0 auto;text-align:right;font-variant-numeric:tabular-nums}
+  .chg.up{color:var(--up)} .chg.down{color:var(--down)}
+  .alert-pill{
+    margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:center;
+    background:var(--down-soft);border:1px solid #F8CDCF;color:#B33238;
+    font-size:12.5px;font-weight:800;padding:8px;border-radius:10px;
+  }
+  .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--down);animation:blink 1.1s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+  .watch-foot{margin-top:10px;font-size:11.5px;color:var(--faint);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+  .ask-card{padding:20px;display:flex;flex-direction:column;justify-content:space-between}
+  .q-label{font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .q-label i{font-style:normal;background:var(--blue);color:#fff;font-size:10px;border-radius:5px;padding:0 6px;font-weight:900}
+  .q-box{width:100%;border:1.5px solid #C9DAFB;background:#FBFDFF;border-radius:12px;padding:12px 14px;font-size:15px;color:var(--ink);outline:none;transition:.15s;box-shadow:inset 0 1px 3px rgba(20,45,110,.04)}
+  .q-box:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,107,255,.16)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 4px}
+  .s-chip{
+    border:1px solid var(--line);background:#fff;color:var(--muted);
+    font-size:12px;padding:4px 11px;border-radius:99px;transition:.15s;font-weight:600;
+  }
+  .s-chip:hover{border-color:var(--blue);color:var(--blue-deep);background:var(--blue-soft)}
+  .ask-actions{display:flex;align-items:center;gap:10px;margin-top:6px}
+  .btn-primary{
+    display:inline-flex;align-items:center;gap:8px;
+    background:linear-gradient(135deg,#4D8BFF,#1549D2);color:#fff;border:none;
+    font-size:14.5px;font-weight:800;padding:11px 24px;border-radius:12px;
+    box-shadow:0 6px 16px rgba(46,107,255,.35);transition:.15s;
+  }
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(46,107,255,.45)}
+  .btn-primary:active{transform:translateY(0)}
+  .btn-primary:disabled{opacity:.55;cursor:not-allowed;transform:none}
+  .ask-micro{font-size:11.5px;color:var(--faint);margin-top:10px}
+  .pipe-flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+  .pipe-flow .pf{font-size:11.5px;font-weight:700;color:var(--blue-deep);background:var(--blue-soft);border:1px solid #D5E3FF;padding:3px 9px;border-radius:7px}
+  .pipe-flow .ar{color:var(--faint);font-weight:900}
+  .why-agent{margin-top:18px;padding:0 4px}
+  .why-agent h4{font-size:13.5px;margin-bottom:6px;color:var(--ink)}
+  .why-agent li{list-style:none;display:flex;gap:8px;font-size:12.5px;color:var(--muted);margin:5px 0}
+  .why-agent li b{color:var(--blue-deep);flex:0 0 auto;font-weight:900}
+
+  /* ===== Screen 2 · Agent ===== */
+  .agent-now{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:linear-gradient(135deg,#1549D2,#2E6BFF);color:#fff;
+    border-radius:var(--r);padding:16px 20px;box-shadow:0 10px 24px rgba(21,73,210,.28);
+    margin-bottom:16px;
+  }
+  .agent-now .spinner{width:18px;height:18px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;flex:0 0 auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .agent-now b{font-size:15px;font-weight:800}
+  .agent-now .at{font-size:12.5px;color:#DCE7FF;margin-left:auto;white-space:nowrap}
+  .q-banner{
+    background:#fff;border:1px solid var(--line);border-left:4px solid var(--blue);
+    border-radius:11px;padding:10px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center;
+  }
+  .q-banner .lbl{flex:0 0 auto;font-size:11.5px;font-weight:800;color:var(--blue-deep);background:var(--blue-soft);padding:2px 9px;border-radius:99px}
+  .q-banner .txt{font-size:14.5px;font-weight:700}
+  .speed-btn{margin-left:auto}
+  .ag-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+  @media(max-width:920px){.ag-grid{grid-template-columns:1fr}.console{flex:none;height:300px}}
+  .ag-col+.ag-col{display:flex;flex-direction:column;min-width:0}
+  .ag-col h3{font-size:13.5px;font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .ag-col h3 .n{color:var(--blue-deep)}
+  .plan-item{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#FDFEFF;transition:.15s}
+  .plan-item .pdot{
+    flex:0 0 auto;width:22px;height:22px;border-radius:7px;background:var(--blue-mist);
+    color:var(--faint);display:grid;place-items:center;font-size:11.5px;font-weight:900;margin-top:1px;
+  }
+  .plan-item .pt{flex:1;min-width:0}
+  .plan-item .pt b{font-size:13px;display:block;font-weight:800}
+  .plan-item .pt span{font-size:11.5px;color:var(--faint)}
+  .plan-item .pstate{flex:0 0 auto;font-size:11px;font-weight:800;color:var(--faint);white-space:nowrap;margin-top:3px}
+  .plan-item.running{border-color:var(--blue);box-shadow:0 0 0 2.5px rgba(46,107,255,.14)}
+  .plan-item.running .pdot{background:var(--blue);color:#fff;animation:spin 1s linear infinite}
+  .plan-item.done{background:var(--up-soft)}
+  .plan-item.done .pdot{background:var(--up);color:#fff;animation:none}
+  .plan-item.done .pstate{color:var(--up)}
+
+  .tool-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+  .tchip{
+    border:1px solid var(--line);background:#FDFEFF;border-radius:99px;padding:5px 11px;
+    font-size:12px;font-weight:700;color:var(--muted);display:inline-flex;gap:7px;align-items:center;transition:.15s;
+  }
+  .tchip .td{width:7px;height:7px;border-radius:50%;background:#D7DFEC}
+  .tchip.live{border-color:#BFD3FF;background:var(--blue-soft);color:var(--blue-deep)}
+  .tchip.live .td{background:var(--blue);animation:blink .7s infinite}
+  .tchip.done{border-color:#BBE5D2;background:var(--up-soft);color:#0B7A4C}
+  .tchip.done .td{background:var(--up)}
+
+  .console{
+    background:#0D1B3E;border-radius:12px;padding:12px 14px;height:auto;min-height:0;flex:1 1 0;
+    margin-bottom:8px;overflow-y:auto;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.8px;line-height:1.75;
+  }
+  .console::-webkit-scrollbar{width:6px}
+  .console::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:3px}
+  .lrow{display:flex;gap:9px;align-items:flex-start;animation:fadein .2s ease}
+  .lrow .tag{flex:0 0 auto;font-size:10px;font-weight:900;letter-spacing:.03em;padding:1px 7px;border-radius:5px;margin-top:3px}
+  .lrow .msg{color:#C6D3EF;word-break:break-word;min-width:0}
+  .tg-blue{background:rgba(77,139,255,.22);color:#8FB6FF}
+  .tg-green{background:rgba(15,165,104,.24);color:#7FE0B7}
+  .tg-purple{background:rgba(140,100,255,.22);color:#C9AFFF}
+  .tg-teal{background:rgba(32,178,170,.22);color:#8CE0DB}
+  .tg-orange{background:rgba(230,150,70,.22);color:#FFC98A}
+  .tg-slate{background:rgba(180,195,220,.18);color:#B9C7E4}
+  .console .sep{height:1px;background:rgba(255,255,255,.1);margin:8px 0}
+
+  .stats-band{display:none;margin-top:18px}
+  .stats-band.show{display:block;animation:fadein .4s ease}
+  .stats-head{display:flex;align-items:baseline;gap:10px;margin:6px 0 12px}
+  .stats-head h3{font-size:16px;font-weight:800}
+  .stats-head .s{font-size:11.5px;color:var(--faint)}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:920px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center;box-shadow:0 4px 12px rgba(20,45,110,.05)}
+  .stat .v{font-size:26px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.2}
+  .stat .v.neg{color:var(--down)} .stat .v.pos{color:var(--up)} .stat .v.blue{color:var(--blue-deep)}
+  .stat .c{font-size:11.5px;color:var(--muted);margin-top:2px;font-weight:600}
+  .pipeline{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:14px 2px 0}
+  .pp{display:flex;align-items:center;gap:6px;background:var(--blue-mist);border:1px solid var(--line);padding:6px 12px;border-radius:10px}
+  .pp b{color:var(--blue-deep);font-size:16px}
+  .pp span{font-size:12px;color:var(--muted);font-weight:700}
+  .pp .arrow{color:var(--blue);font-weight:900}
+  .pp.keep{background:var(--up-soft);border-color:#BBE5D2}
+  .pp.keep b{color:#0B7A4C}
+  .noise-note{margin-top:12px;font-size:12px;color:var(--muted);background:var(--blue-mist);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+  .noise-note b{color:var(--blue-deep)}
+  .cta-row{margin-top:16px;display:flex;gap:10px;flex-wrap:wrap}
+  .btn-ghost{border:1px solid var(--line);background:#fff;color:var(--muted);font-weight:800;font-size:13px;padding:10px 18px;border-radius:11px;transition:.15s}
+  .btn-ghost:hover{color:var(--blue-deep);border-color:var(--blue);background:var(--blue-soft)}
+
+  /* ===== Screen 3 · What Matters ===== */
+  .m-sum{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+  .m-sum .badge{font-size:11.5px;font-weight:800;background:var(--down-soft);color:#B33238;border:1px solid #F8CDCF;padding:3px 11px;border-radius:99px}
+  .m-sum .badge.b{background:var(--blue-soft);color:var(--blue-deep);border-color:#D5E3FF}
+  .signals{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+
+  details.sig{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:0 4px 14px rgba(20,45,110,.05)}
+  details.sig[open]{box-shadow:var(--shadow)}
+  details.sig summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;gap:12px;align-items:flex-start;position:relative}
+  details.sig summary::-webkit-details-marker{display:none}
+  .sig-num{flex:0 0 auto;width:30px;height:30px;border-radius:9px;background:var(--blue-soft);color:var(--blue-deep);font-weight:900;display:grid;place-items:center;font-size:13px}
+  details.sig.hot summary .sig-num{background:var(--blue);color:#fff;box-shadow:0 4px 10px rgba(46,107,255,.35)}
+  .sig-main{flex:1;min-width:0}
+  .sig-top{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:3px}
+  .st-pill{font-size:10.5px;font-weight:900;letter-spacing:.04em;padding:1px 8px;border-radius:99px}
+  .st-hot{background:var(--down-soft);color:#B33238;border:1px solid #F8CDCF}
+  .st-blu{background:var(--blue-soft);color:var(--blue-deep);border:1px solid #D5E3FF}
+  .st-amb{background:var(--amber-soft);color:var(--amber);border:1px solid #F2D8AC}
+  .sig-title{font-size:15.5px;font-weight:800;line-height:1.4}
+  .sig-sum{font-size:12.5px;color:var(--muted);margin-top:3px}
+  .sig-toggle{margin-left:auto;flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--muted);display:grid;place-items:center;font-size:15px;font-weight:900;transition:.2s}
+  details.sig[open] .sig-toggle{transform:rotate(45deg);color:var(--blue-deep);border-color:var(--blue)}
+
+  .sig-body{padding:4px 18px 18px;border-top:1px dashed var(--line)}
+  .fiu{margin-top:14px;border-radius:12px;padding:12px 14px}
+  .fiu .h{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:900;letter-spacing:.05em;margin-bottom:8px}
+  .fiu .h .bx{width:16px;height:16px;border-radius:5px;display:grid;place-items:center;font-size:9px;color:#fff;font-weight:900}
+  .fiu.fact{background:var(--up-soft)}
+  .fiu.fact .h{color:#0B7A4C}
+  .fiu.fact .h .bx{background:var(--up)}
+  .fiu.interp{background:var(--amber-soft)}
+  .fiu.interp .h{color:var(--amber)}
+  .fiu.interp .h .bx{background:var(--amber)}
+  .fiu.uncer{background:var(--violet-soft)}
+  .fiu.uncer .h{color:var(--violet)}
+  .fiu.uncer .h .bx{background:var(--violet)}
+  .fact-item{padding:7px 0;border-bottom:1px dashed rgba(20,45,110,.08)}
+  .fact-item:last-child{border-bottom:none}
+  .fact-item .ft{font-size:13.5px;color:#12301F;font-weight:600;display:flex;gap:8px}
+  .fact-item .fi{flex:0 0 auto;width:16px;height:16px;border-radius:50%;background:var(--up);color:#fff;font-size:10px;font-weight:900;display:grid;place-items:center;margin-top:4px}
+  .src-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;margin-left:24px}
+  .src-btn{
+    border:1px solid #BFE0CE;background:#fff;color:#0B7A4C;font-size:11.5px;font-weight:700;
+    padding:3px 10px;border-radius:99px;transition:.15s;
+  }
+  .src-btn:hover{background:var(--up);color:#fff;border-color:var(--up)}
+  .fiu p{font-size:13.5px;color:#5A4A22;margin:0}
+  .fiu.interp p{color:#6A4A10}
+  .uncer-list{list-style:none}
+  .uncer-list li{display:flex;gap:9px;font-size:13px;color:#45326F;padding:4px 0}
+  .uncer-list li::before{content:"?";flex:0 0 auto;width:17px;height:17px;border-radius:50%;background:var(--violet);color:#fff;font-size:11px;font-weight:900;display:grid;place-items:center;margin-top:3px}
+
+  /* Noise bar */
+  .noise-bar{
+    margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    background:#fff;border:1px dashed #C9CFDD;border-radius:var(--r);padding:14px 18px;
+    cursor:pointer;transition:.15s;
+  }
+  .noise-bar:hover{border-color:var(--blue);background:var(--blue-mist)}
+  .noise-ic{width:34px;height:34px;border-radius:10px;background:#EDF0F6;color:var(--muted);display:grid;place-items:center;font-size:16px;font-weight:900;flex:0 0 auto}
+  .noise-tx{flex:1;min-width:0}
+  .noise-tx b{font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .noise-tx .cnt{background:var(--down-soft);color:#B33238;font-size:11px;font-weight:900;border:1px solid #F8CDCF;padding:0 8px;border-radius:99px}
+  .noise-tx small{display:block;color:var(--faint);font-size:11.5px}
+  .noise-go{flex:0 0 auto;font-size:19px;color:var(--blue);font-weight:900}
+
+  /* Conversation / ask-next */
+  .conv-card{margin-top:18px;padding:20px}
+  .conv{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+  .msg{max-width:82%;border-radius:14px;padding:10px 14px;font-size:13.5px;line-height:1.7;animation:fadein .3s ease}
+  .msg.u{align-self:flex-end;background:linear-gradient(135deg,#4D8BFF,#1549D2);color:#fff;border-bottom-right-radius:4px}
+  .msg.a{align-self:flex-start;background:var(--blue-mist);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:4px}
+  .msg.a b{color:var(--blue-deep)}
+  .ask-next-t h4{font-size:13.5px;font-weight:800;margin-bottom:2px}
+  .ask-next-t p{font-size:12px;color:var(--faint);margin-bottom:10px}
+  .next-chips{display:flex;flex-wrap:wrap;gap:7px}
+  .next-chips .s-chip{padding:6px 13px;font-size:12.5px}
+  .q-row{display:flex;gap:8px;margin-top:14px}
+  .q-row input{flex:1;border:1.5px solid #C9DAFB;border-radius:11px;padding:10px 14px;font-size:13.5px;outline:none}
+  .q-row input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(46,107,255,.16)}
+  .btn-send{border:none;background:var(--blue);color:#fff;font-weight:800;font-size:13px;padding:0 20px;border-radius:11px;transition:.15s}
+  .btn-send:hover{background:var(--blue-deep)}
+
+  /* ===== Screen 4 · Decision Support ===== */
+  .ds-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 14px}
+  .mode-tag{font-size:12px;font-weight:900;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,#6C3FD1,#9B5CF6);padding:4px 12px;border-radius:99px;box-shadow:0 4px 12px rgba(108,63,209,.3)}
+  .safe-line{
+    background:var(--blue-soft);border:1px solid #D5E3FF;border-radius:12px;color:var(--blue-deep);
+    font-size:14px;font-weight:800;padding:13px 16px;margin-bottom:16px;line-height:1.6;
+  }
+  .period-wrap{margin-bottom:14px}
+  .period-wrap .p-label{font-size:12.5px;font-weight:800;color:var(--muted);margin-bottom:8px}
+  .period-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:640px){.period-btns{grid-template-columns:1fr}}
+  .pbtn{border:1.5px solid var(--line);background:#fff;border-radius:13px;padding:13px 12px;text-align:left;transition:.15s;position:relative}
+  .pbtn:hover{border-color:var(--blue)}
+  .pbtn b{font-size:14px;display:flex;align-items:center;gap:6px}
+  .pbtn small{display:block;color:var(--faint);font-size:11px;margin-top:2px}
+  .pbtn.on{border-color:var(--blue);background:var(--blue-soft);box-shadow:0 0 0 2.5px rgba(46,107,255,.18)}
+  .pbtn.on b{color:var(--blue-deep)}
+  .pbtn .ck{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--blue);color:#fff;display:none;place-items:center;font-size:11px;font-weight:900}
+  .pbtn.on .ck{display:grid}
+
+  #periodResult{margin-top:6px}
+  .res-note{font-size:12.5px;color:var(--muted);background:var(--blue-mist);border:1px solid var(--line);border-radius:11px;padding:10px 14px;margin-bottom:14px;line-height:1.7}
+  .res-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:820px){.res-grid{grid-template-columns:1fr}}
+  .col-card{border-radius:var(--r);padding:16px;border:1px solid var(--line);background:#fff}
+  .col-card sup{font-size:12px;font-weight:900;letter-spacing:.05em;display:inline-block;padding:2px 10px;border-radius:99px;margin-bottom:10px}
+  .sup-yes{background:var(--up-soft);color:#0B7A4C;border:1px solid #BFE0CE}
+  .sup-no{background:var(--down-soft);color:#B33238;border:1px solid #F8CDCF}
+  .cond{list-style:none}
+  .cond li{display:flex;gap:9px;font-size:13px;color:#33415E;padding:7px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+  .cond li:last-child{border-bottom:none}
+  .cond li::before{content:"";flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--up);margin-top:7px}
+  .col-card.no .cond li::before{background:var(--down)}
+  .watch-card2{margin-top:14px;border-radius:var(--r);padding:16px;background:#fff;border:1px solid var(--line)}
+  .watch-card2 .wh{font-size:13px;font-weight:900;letter-spacing:.05em;color:var(--blue-deep);display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .watch-card2 .wh .bx{width:18px;height:18px;border-radius:6px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:10px}
+  .watch-list{list-style:none}
+  .watch-list li{display:flex;gap:9px;padding:7px 0;font-size:13px;color:#33415E;border-bottom:1px dashed var(--line)}
+  .watch-list li:last-child{border:none}
+  .watch-list li .wdot{flex:0 0 auto;width:5px;height:5px;border-radius:50%;background:var(--blue);margin-top:8px;box-shadow:0 0 0 3px rgba(46,107,255,.18)}
+  .placeholder-c{margin-top:8px;border:1.5px dashed #C9CFDD;border-radius:var(--r);padding:26px 18px;text-align:center;color:var(--faint);font-size:13px}
+
+  /* ===== Modals ===== */
+  .overlay{position:fixed;inset:0;background:rgba(13,27,62,.45);z-index:100;display:none;align-items:flex-start;justify-content:center;padding:6vh 16px 40px;overflow-y:auto}
+  .overlay.open{display:flex;animation:fadein .2s ease}
+  .modal{background:#fff;border-radius:18px;width:100%;max-width:720px;margin:auto 0;box-shadow:0 24px 60px rgba(8,20,50,.35);overflow:hidden}
+  .m-head{display:flex;align-items:flex-start;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+  .m-head .mt{flex:1;min-width:0}
+  .m-head .mt b{font-size:15.5px;display:block;line-height:1.4}
+  .m-head .mt small{color:var(--faint);font-size:11.5px}
+  .m-x{flex:0 0 auto;width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:16px;color:var(--muted);display:grid;place-items:center;transition:.15s}
+  .m-x:hover{background:var(--down-soft);color:var(--down);border-color:#F8CDCF}
+  .m-body{padding:18px 20px;max-height:62vh;overflow-y:auto}
+  .m-foot{padding:12px 20px;border-top:1px solid var(--line);background:var(--blue-mist);font-size:11px;color:var(--faint)}
+  .m-sec{margin-bottom:16px}
+  .m-sec .ms-t{font-size:12px;font-weight:900;color:var(--muted);letter-spacing:.04em;margin-bottom:6px}
+  .src-card{border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:10px;padding:10px 13px;margin-bottom:9px;background:#FDFEFF}
+  .src-card .s-top{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px}
+  .s-name{font-size:13px;font-weight:800}
+  .s-type{font-size:10.5px;font-weight:800;background:var(--blue-soft);color:var(--blue-deep);border:1px solid #D5E3FF;padding:0 7px;border-radius:99px}
+  .s-time{font-size:11px;color:var(--faint)}
+  .s-quote{font-size:12.5px;color:#33415E;background:var(--blue-mist);border:1px solid var(--line);border-radius:8px;padding:8px 11px;margin-top:5px;font-style:normal}
+  .s-quote::before{content:"❝ ";color:var(--blue)}
+  .s-note{margin-top:6px;font-size:11.5px;color:#0B7A4C;background:var(--up-soft);border-radius:8px;padding:5px 10px;display:inline-block}
+  .s-fact{margin-top:3px;font-size:12.5px;color:var(--muted);padding:6px 0 10px;border-bottom:1px dashed var(--line)}
+  .facthead{display:flex;gap:7px;align-items:center;font-weight:800;color:#0B7A4C;font-size:13px;margin-bottom:4px}
+  .facthead .fk{width:17px;height:17px;border-radius:50%;background:var(--up);color:#fff;display:grid;place-items:center;font-size:10px}
+
+  .noise-cat{margin-bottom:15px}
+  .nc-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .nc-head .nc-t{font-weight:800;font-size:14px}
+  .nc-head .nc-c{font-size:11px;font-weight:900;color:#B33238;background:var(--down-soft);border:1px solid #F8CDCF;padding:0 8px;border-radius:99px}
+  .nc-why{width:100%;font-size:11px;color:var(--faint);margin-top:2px}
+  .noise-item{border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:8px;background:#FDFEFF}
+  .noise-item .ni-t{font-size:13px;font-weight:700}
+  .noise-item .ni-meta{font-size:11px;color:var(--faint);margin:1px 0 5px}
+  .noise-item .ni-why{font-size:12px;color:#7A5B0A;background:var(--amber-soft);border-radius:7px;padding:4px 9px}
+  .noise-item .ni-why b{font-weight:800}
+
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:#0D1B3E;color:#fff;font-size:13px;padding:10px 18px;border-radius:11px;
+    opacity:0;pointer-events:none;transition:.25s;z-index:200;max-width:90vw;text-align:center;
+    box-shadow:0 10px 26px rgba(8,20,50,.3);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .f-note{margin-top:34px;padding-top:14px;border-top:1px solid var(--line);color:var(--faint);font-size:11.5px;text-align:center;line-height:1.8}
+  .f-note b{color:var(--muted)}
+
+  /* ---- Rev2 · Evidence Status / Materiality / Modal 状态徽标 ---- */
+  .why-ret{margin-top:7px;font-size:11.5px;line-height:1.6;font-weight:700;color:#24406B;background:#EEF4FF;border:1px solid #D5E3FF;border-radius:7px;padding:3px 9px;display:inline-block}
+  .why-ret b{font-weight:900;color:var(--blue-deep)}
+
+  .fiu.claim{background:var(--amber-soft)}
+  .fiu.claim .h{color:#8A4A00}
+  .fiu.claim .h .bx{background:var(--amber)}
+  .fiu.claim .claim-note{font-size:11.5px;font-weight:900;color:#8A4A00;background:#FFF7E8;border:1px solid #F2D8AC;border-radius:8px;padding:6px 10px;margin:8px 0;line-height:1.6}
+  .claim-row{margin:7px 0 2px}
+  .claim-row .cr-t{font-size:11px;font-weight:900;letter-spacing:.05em;color:#8A4A00;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+  .claim-row .cr-t::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--amber);flex:0 0 auto}
+  .claim-row p{font-size:13px;color:#5A4508;margin:0;line-height:1.7}
+  .claim-row ul{list-style:none;margin:0}
+  .claim-row li{display:flex;gap:8px;font-size:12.5px;color:#5A4508;padding:3px 0;line-height:1.6}
+  .claim-row li::before{content:"·";flex:0 0 auto;color:var(--amber);font-weight:900}
+  .fiu.conflict{background:#FBF1F1}
+  .fiu.conflict .h{color:#A0343A}
+  .fiu.conflict .h .bx{background:var(--down)}
+  .src-btn.warn{border-color:#F2D8AC;color:#8A4A00}
+  .src-btn.warn:hover{background:var(--amber);color:#fff;border-color:var(--amber)}
+
+  .noise-principle{background:var(--blue-soft);border:1px solid #D5E3FF;border-radius:10px;padding:10px 13px;margin-bottom:16px;font-size:12.5px;color:#27406E;line-height:1.75}
+  .noise-principle b{color:var(--blue-deep)}
+
+  .ev-status{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0 12px}
+  .ev-pill{font-size:10.5px;font-weight:900;letter-spacing:.08em;padding:2px 11px;border-radius:99px}
+  .ev-confirmed{background:var(--up-soft);color:#0B7A4C;border:1px solid #BFE0CE}
+  .ev-unverified{background:var(--amber-soft);color:#8A4A00;border:1px solid #F2D8AC}
+  .ev-conflict{background:var(--down-soft);color:#A0343A;border:1px solid #F0C4C6}
+  .ev-note{font-size:12.5px;color:#33415E;background:#F7F9FE;border:1px solid var(--line);border-radius:10px;padding:9px 13px;line-height:1.7;margin-top:6px}
+  .ev-note b{color:var(--blue-deep)}
+  .s-primary{font-size:9.5px;font-weight:900;letter-spacing:.03em;padding:1px 8px;border-radius:99px;background:#EAF1FF;color:var(--blue-deep);border:1px solid #BFD3FF}
+  .s-unveri{font-size:9.5px;font-weight:900;letter-spacing:.03em;padding:1px 8px;border-radius:99px;background:var(--amber-soft);color:#8A4A00;border:1px solid #F2D8AC}
+  .s-market{font-size:9.5px;font-weight:900;letter-spacing:.03em;padding:1px 8px;border-radius:99px;background:#EDF0F6;color:#33415E;border:1px solid var(--line)}
+
+  .principle{border:1px solid var(--line);border-left:4px solid var(--blue);background:#F7FAFF;border-radius:11px;padding:12px 15px;margin-bottom:14px;font-size:12.5px;color:#33415E;line-height:1.8}
+  .principle b{color:var(--blue-deep)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="h-in">
+    <div class="brand" onclick="goHome()" title="返回首页">
+      <div class="logo">S</div>
+      <div class="brand-name">Signal<em>Lens</em><span class="brand-tag">AI 投研助手</span></div>
+    </div>
+    <div class="h-right">
+      <span class="mock-pill">Mock Demo · 无真实 API</span>
+      <button class="nav-btn" onclick="goHome()">返回首页</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ Screen 1 · Watchlist / Ask ============ -->
+  <section class="screen" id="screenAsk">
+    <div class="page-head">
+      <div class="eyebrow">Screen 1 · Watchlist / Ask</div>
+      <h2 class="title">你的自选股今天发生了什么？</h2>
+      <p class="sub">描述你注意到的情况，SignalLens 会完成信息收集 → 去重 → 过滤 → 验证 → 解释的完整链路。</p>
+    </div>
+
+    <div class="ask-grid">
+      <div class="card watch-card">
+        <div class="w-title"><span class="dot"></span>自选股 Watchlist</div>
+        <div class="w-hint">演示数据 · 行情截至今日收盘</div>
+
+        <div class="watch-row featured">
+          <div class="w-sym">凌</div>
+          <div class="w-id">
+            <b>凌云科技 <span style="color:var(--faint);font-weight:600;font-size:11px">LYTE · 算力与 AI 服务器</span></b>
+            <small>今日 27 条新信息待分析</small>
+          </div>
+          <div class="chg down">-6.2%</div>
+        </div>
+
+        <div class="watch-row">
+          <div class="w-sym" style="background:var(--up-soft);color:var(--up)">新</div>
+          <div class="w-id"><b>新海能源</b><small>能源设备</small></div>
+          <div class="chg up">+0.84%</div>
+        </div>
+        <div class="watch-row">
+          <div class="w-sym">光</div>
+          <div class="w-id"><b>光启精工</b><small>精密制造</small></div>
+          <div class="chg down">-1.25%</div>
+        </div>
+        <div class="watch-row">
+          <div class="w-sym" style="background:var(--up-soft);color:var(--up)">北</div>
+          <div class="w-id"><b>北境软件</b><small>企业软件</small></div>
+          <div class="chg up">+2.04%</div>
+        </div>
+
+        <div class="alert-pill"><span class="pulse-dot"></span>凌云科技今日跌幅较大 · 资讯热度显著高于平日</div>
+        <div class="watch-foot">
+          <span>凌云科技在自选股中创建于 2026-03</span>
+        </div>
+      </div>
+
+      <div class="card ask-card">
+        <div class="q-label">Ask SignalLens <i>问题</i></div>
+        <input class="q-box" id="askInput" value="今天怎么突然跌这么多？" placeholder="描述你注意到的行情 / 新闻 / 公告…">
+        <div class="chips">
+          <button class="s-chip" type="button" onclick="setAsk(&#39;为什么今天跌了这么多？&#39;)">为什么今天跌了这么多？</button>
+          <button class="s-chip" type="button" onclick="setAsk(&#39;和公司的公告有关系吗？&#39;)">和公司的公告有关系吗？</button>
+          <button class="s-chip" type="button" onclick="setAsk(&#39;接下来要观察什么？&#39;)">接下来要观察什么？</button>
+        </div>
+        <div class="ask-actions">
+          <button class="btn-primary" id="btnAnalyze" onclick="startAgent()">Analyze</button>
+          <span style="font-size:12px;color:var(--faint)">提交后将展示完整 Agent 分析过程</span>
+        </div>
+        <div class="pipe-flow">
+          <span class="pf">收集信息</span><span class="ar">→</span>
+          <span class="pf">去重</span><span class="ar">→</span>
+          <span class="pf">相关性过滤</span><span class="ar">→</span>
+          <span class="pf">事实交叉验证</span><span class="ar">→</span>
+          <span class="pf">分层解释</span>
+        </div>
+        <div class="why-agent">
+          <h4>为什么不是简单问答？</h4>
+          <ul>
+            <li><b>①</b>行情波动伴随大量重复与噪音信息，需要先清洗，才能看到真正重要的东西</li>
+            <li><b>②</b>事实与分析会被明确分层，关键事实都绑定来源，可自行核查</li>
+            <li><b>③</b>对未来的影响只表达情景与不确定性，不替你下结论</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Screen 2 · Agent Execution ============ -->
+  <section class="screen hidden" id="screenAgent">
+    <div class="page-head">
+      <div class="eyebrow">Screen 2 · Agent Execution</div>
+      <h2 class="title">SignalLens Agent 正在执行分析计划</h2>
+      <p class="sub">这不是一次性问答——Agent 正在多源收集、去重并过滤噪音，只保留真正值得关注的信号。</p>
+    </div>
+
+    <div class="agent-now">
+      <span class="spinner" id="agentSpinner"></span>
+      <b id="agentNow">Step 4/6 · Filter Noise &amp; Keep Candidates</b>
+      <span class="at" id="agentPct">50%</span>
+      <button class="btn-ghost speed-btn" id="btnSpeed" onclick="toggleSpeed()" style="color:#fff;border-color:rgba(255,255,255,.4);background:rgba(255,255,255,.08)">动画加速 ×4</button>
+    </div>
+
+    <div class="q-banner">
+      <span class="lbl">当前问题</span>
+      <span class="txt" id="askQ">今天怎么突然跌这么多？</span>
+    </div>
+
+    <div class="ag-grid">
+      <div class="ag-col">
+        <h3><span class="n">01</span> Agent Plan · 6 步计划</h3>
+        <div id="planList"><div class="plan-item done" id="plan-0"><span class="pdot">1</span><div class="pt"><b>Load User Context</b><span>读取自选股与浏览上下文（不推断持仓）</span></div><span class="pstate" id="pstate-0">完成 ✓</span></div><div class="plan-item done" id="plan-1"><span class="pdot">2</span><div class="pt"><b>Fetch Market &amp; Information</b><span>多源获取实时/历史行情、财经新闻与公司公告</span></div><span class="pstate" id="pstate-1">完成 ✓</span></div><div class="plan-item done" id="plan-2"><span class="pdot">3</span><div class="pt"><b>Deduplicate</b><span>识别同源转载，移除重复信息</span></div><span class="pstate" id="pstate-2">完成 ✓</span></div><div class="plan-item running" id="plan-3"><span class="pdot">4</span><div class="pt"><b>Filter Noise &amp; Keep Candidates</b><span>按噪音过滤维度筛出候选信号（此步先不下“多重要”结论）</span></div><span class="pstate" id="pstate-3">进行中</span></div><div class="plan-item" id="plan-4"><span class="pdot">5</span><div class="pt"><b>Verify Evidence</b><span>对保留信号做证据状态分级</span></div><span class="pstate" id="pstate-4">待执行</span></div><div class="plan-item" id="plan-5"><span class="pdot">6</span><div class="pt"><b>Materiality &amp; Impact Analysis</b><span>在证据验证之后排重要性，再构建影响路径与不确定性分层</span></div><span class="pstate" id="pstate-5">待执行</span></div></div>
+      </div>
+      <div class="ag-col">
+        <h3><span class="n">02</span> Tool Activity · 工具调用</h3>
+        <div class="tool-chips" id="toolChips"><span class="tchip done" id="tool-0"><span class="td"></span>Market Data</span><span class="tchip done" id="tool-1"><span class="td"></span>Historical Market Data</span><span class="tchip done" id="tool-2"><span class="td"></span>Financial News</span><span class="tchip done" id="tool-3"><span class="td"></span>Company Announcements</span><span class="tchip done" id="tool-4"><span class="td"></span>User Watchlist / Browsing Context</span></div>
+        <div class="console" id="toolLog"><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">已接收问题：「今天怎么突然跌这么多？」</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">启动 6 步分析计划，调用 5 类工具…</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">▸ 开始步骤 1: Load User Context · 读取自选股与浏览上下文（不推断持仓）</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">────────────────────────────────</span></div><div class="lrow"><span class="tag tg-orange">Browsing Context</span><span class="msg">读取自选股：凌云科技（LYTE）及行业关注范围</span></div><div class="lrow"><span class="tag tg-orange">Browsing Context</span><span class="msg">读取浏览记录：凌云科技为近 7 日浏览频次最高的标的</span></div><div class="lrow"><span class="tag tg-orange">Browsing Context</span><span class="msg">明确边界：自选股 ≠ 已持仓，不把浏览行为当作投资假设</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">▸ 开始步骤 2: Fetch Market &amp; Information · 多源获取实时/历史行情、财经新闻与公司公告</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">────────────────────────────────</span></div><div class="lrow"><span class="tag tg-blue">Market Data</span><span class="msg">实时行情 GET quote?symbol=LYTE → 200 · 今日收跌 6.2%</span></div><div class="lrow"><span class="tag tg-blue">Market Data</span><span class="msg">实时行情：算力/服务器板块同步回落约 -1.5% ~ -3%</span></div><div class="lrow"><span class="tag tg-teal">Historical Market Data</span><span class="msg">加载近 30 日历史行情：今日量价特征偏离历史常态</span></div><div class="lrow"><span class="tag tg-green">Financial News</span><span class="msg">财经新闻检索（近 24 小时）：命中 15 条，含业绩会报道与市场传闻</span></div><div class="lrow"><span class="tag tg-purple">Company Announcements</span><span class="msg">公司公告：当日正式公告 0 条；业绩交流会纪要 1 份（9/8 盘后）</span></div><div class="lrow"><span class="tag tg-orange">Browsing Context</span><span class="msg">浏览记录命中：用户近期浏览过该公司订单与业绩相关资讯</span></div><div class="lrow"><span class="tag tg-green">Financial News</span><span class="msg">初步收集原始信息：27 条（财经新闻 / 公司公告 / 行情）</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">▸ 开始步骤 3: Deduplicate · 识别同源转载，移除重复信息</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">────────────────────────────────</span></div><div class="lrow"><span class="tag tg-green">Financial News</span><span class="msg">检测同源转载：毛利率指引相关报道被 11 家媒体转写</span></div><div class="lrow"><span class="tag tg-green">Financial News</span><span class="msg">标题与正文相似度 &gt; 92%，判定为转载，仅保留最早权威源</span></div><div class="lrow"><span class="tag tg-green">Financial News</span><span class="msg">结果：27 → 16 条（移除重复 11 条）</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">▸ 开始步骤 4: Filter Noise &amp; Keep Candidates · 按噪音过滤维度筛出候选信号（此步先不下“多重要”结论）</span></div><div class="lrow"><span class="tag tg-purple">Agent</span><span class="msg">────────────────────────────────</span></div></div>
+      </div>
+    </div>
+
+    <div class="stats-band" id="statsBand">
+      <div class="stats-head">
+        <h3>本轮执行摘要</h3>
+        <span class="s">已完成 · 进入验证环节的信号全部带来源与证据状态（CONFIRMED FACT / UNVERIFIED CLAIM）</span>
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><div class="v blue" data-count="27">0</div><div class="c">items collected · 原始信息</div></div>
+        <div class="stat"><div class="v neg" data-count="11">0</div><div class="c">duplicates removed · 重复转载已移除</div></div>
+        <div class="stat"><div class="v neg" data-count="12">0</div><div class="c">low-relevance items filtered · 低相关已过滤</div></div>
+        <div class="stat"><div class="v pos" data-count="4">0</div><div class="c">material signals retained · Material Signals 保留</div></div>
+      </div>
+      <div class="pipeline">
+        <span class="pp"><b>27</b><span>items collected</span></span>
+        <span class="pp"><b class="arrow">→</b><span>去重后 16</span></span>
+        <span class="pp"><b class="arrow">→</b><span>过滤后 4</span></span>
+        <span class="pp keep"><b>4</b><span>Material Signals</span></span>
+      </div>
+      <div class="noise-note">噪音占比 <b>85%（23 / 27）</b>：重复转载、无新增事实的观点/二次解读资讯、与标的关系弱的行业信息已全部被过滤。Agent 不是「读了 27 条再聊天」，而是把信息量收敛到可判断的 <b>4 条</b>。</div>
+      <div class="cta-row">
+        <button class="btn-primary" onclick="goToMatters()">查看 What Matters →</button>
+        <button class="btn-ghost" onclick="goHome()">返回首页</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Screen 3 · What Matters ============ -->
+  <section class="screen hidden" id="screenMatters">
+    <div class="page-head">
+      <div class="eyebrow">Screen 3 · What Matters</div>
+      <div class="m-sum">
+        <h2 class="title" style="margin:6px 0 2px">4 条值得关注的 Material Signals</h2>
+        <span class="badge b">凌云科技 · 今日 -6.2%</span>
+      </div>
+      <p class="sub">这 4 条是经过 <b>去重与噪音过滤 → Evidence Verification → Materiality 排序</b> 后进入深度分析的高相关信号。<b>Material Signal ≠ Confirmed Fact</b>——其中可能同时包含 CONFIRMED FACT 与 UNVERIFIED CLAIM，每条都按证据状态明确分层，并附 INTERPRETATION 与 UNCERTAINTY，不混为一谈。</p>
+    </div>
+    <div class="signals" id="signalsList"></div>
+    <div class="noise-bar" onclick="openNoise()">
+      <div class="noise-ic">✕</div>
+      <div class="noise-tx">
+        <b>Filtered as Noise <span class="cnt">23 items</span></b>
+        <small>重复转载 · 无新增事实的观点/二次解读资讯 · 与标的关系弱的行业信息 —— 点击查看为什么它们被过滤</small>
+      </div>
+      <span class="noise-go">›</span>
+    </div>
+
+    <div class="conv-card card">
+      <div class="conv" id="convLog"></div>
+      <div class="ask-next-t">
+        <h4>你还可以追问</h4>
+        <p>SignalLens 只解释信息，不替你做交易决定。但任何疑问都可以继续问。</p>
+      </div>
+      <div class="next-chips">
+        <button class="s-chip" type="button" onclick="askFromMatters(&#39;那是不是应该卖？&#39;)">那是不是应该卖？</button>
+        <button class="s-chip" type="button" onclick="askFromMatters(&#39;现在能上车吗？&#39;)">现在能上车吗？</button>
+        <button class="s-chip" type="button" onclick="askFromMatters(&#39;毛利率下修的影响有多大？&#39;)">毛利率下修的影响有多大？</button>
+        <button class="s-chip" type="button" onclick="askFromMatters(&#39;什么情况下需要警惕？&#39;)">什么情况下需要警惕？</button>
+      </div>
+      <div class="q-row">
+        <input id="mattersInput" placeholder="输入你想追问的问题，回车发送…" onkeydown="if(event.key===&#39;Enter&#39;)sendMattersAsk()">
+        <button class="btn-send" onclick="sendMattersAsk()">追问</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Screen 4 · Decision Support ============ -->
+  <section class="screen hidden" id="screenDecision">
+    <div class="page-head">
+      <div class="eyebrow">Screen 4 · Decision Support</div>
+      <div class="ds-head">
+        <h2 class="title" style="margin:6px 0 2px">切换到 Decision Support Mode</h2>
+        <span class="mode-tag">DECISION SUPPORT</span>
+      </div>
+      <p class="sub">你不会在这里得到「买」或「卖」的指令——你得到的是：哪些情况可能缓解当前风险、哪些情况可能加剧当前风险，以及该观察什么。</p>
+    </div>
+
+    <div class="conv" id="dsConv" style="margin-bottom:14px"></div>
+
+    <div class="safe-line">我不会根据自选股或浏览记录推断你的持仓状态或投资逻辑。我会列出：哪些情况会缓解当前风险、哪些情况会加剧当前风险——但最终投资决定由你完成。</div>
+
+    <div class="card" style="padding:20px">
+      <div class="principle">
+        <b>Decision Support 的工作方式：</b><br>
+        ① 自选股 ≠ 已持仓，浏览记录 ≠ 投资假设——SignalLens 不替你构造投资逻辑。<br>
+        ② 输出全部采用<b>条件式情景</b>：把「哪些情况会缓解当前风险」与「哪些情况会加剧当前风险」分开，再给出 What to Watch，由你自行对照判断。
+      </div>
+
+      <div class="period-wrap">
+        <div class="p-label">你关注的是哪个时间周期？ <span style="color:var(--faint);font-weight:600">选择后，条件会随周期不同而改变。</span></div>
+        <div class="period-btns">
+          <button class="pbtn" id="pbtn-near" onclick="renderPeriod(&#39;near&#39;)">
+            <span class="ck">✓</span>
+            <b>未来几天</b>
+            <small>情绪消化与事件驱动</small>
+          </button>
+          <button class="pbtn" id="pbtn-mid" onclick="renderPeriod(&#39;mid&#39;)">
+            <span class="ck">✓</span>
+            <b>未来 1–2 季度</b>
+            <small>盈利兑现与基本面验证</small>
+          </button>
+          <button class="pbtn" id="pbtn-long" onclick="renderPeriod(&#39;long&#39;)">
+            <span class="ck">✓</span>
+            <b>长期</b>
+            <small>行业格局与成长中枢</small>
+          </button>
+        </div>
+      </div>
+
+      <div id="periodResult">
+        <div class="placeholder-c">点击上方选择时间周期，SignalLens 将按「风险缓解条件 / 风险升级条件 / What to Watch」给出该周期的观察清单。</div>
+      </div>
+    </div>
+
+    <div class="cta-row" style="margin-top:16px">
+      <button class="btn-primary" onclick="goToMatters()">← 返回关键信号</button>
+      <button class="btn-ghost" onclick="goHome()">返回首页 · 重新开始</button>
+    </div>
+  </section>
+
+  <div class="f-note">
+    SignalLens · AI 投研助手 —— Interactive Demo · 02_demo.html<br>
+    本页全部数据均为虚构 Mock 数据，不接真实 API，不构成任何投资建议。<b>AI 负责筛选、验证、解释；投资决策永远由你完成。</b>
+  </div>
+</main>
+
+<!-- Source Modal -->
+<div class="overlay" id="overlaySource" onclick="if(event.target===this)closeModal(&#39;overlaySource&#39;)">
+  <div class="modal">
+    <div class="m-head">
+      <div class="mt"><b id="srcTitle">Source</b><small>SignalLens · 关键事实来源核验（演示数据）</small></div>
+      <button class="m-x" onclick="closeModal(&#39;overlaySource&#39;)">✕</button>
+    </div>
+    <div class="m-body" id="srcBody"></div>
+    <div class="m-foot">来源仅作演示示例。真实产品中：关键事实必须绑定可访问的原始来源，供用户逐条核验。</div>
+  </div>
+</div>
+
+<!-- Noise Modal -->
+<div class="overlay" id="overlayNoise" onclick="if(event.target===this)closeModal(&#39;overlayNoise&#39;)">
+  <div class="modal">
+    <div class="m-head">
+      <div class="mt"><b>Filtered as Noise · 23 条噪音为什么被过滤</b><small>这 23 条信息没有进入最终信号，因为它们不增加「可验证的事实或对凌云科技的直接影响」。</small></div>
+      <button class="m-x" onclick="closeModal(&#39;overlayNoise&#39;)">✕</button>
+    </div>
+    <div class="m-body" id="noiseBody"></div>
+    <div class="m-foot">过滤由 Agent 自动完成：去重 → 相关性 / 新增事实等噪音维度判断（Noise Filtering）；重要性排序（Materiality）在证据验证之后进行。这些内容默认不进入核心分析，但用户仍可查看过滤原因并自行复核。</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   SignalLens · Interactive Demo (Mock Data)
+   四个 Screen：Ask → Agent Execution → What Matters → Decision Support
+   ===================================================================== */
+
+/* ---------- 状态 ---------- */
+var state = { q1:'', q2:'', convBuilt:false };
+var speed = 1;
+var timers = [];
+var agentRunning = false;
+var agentFinished = false;
+
+function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+function tick(fn, ms){ var t = setTimeout(fn, Math.max(30, ms / speed)); timers.push(t); }
+
+/* ---------- 通用 ---------- */
+function showScreen(id){
+  var s = ['screenAsk','screenAgent','screenMatters','screenDecision'];
+  s.forEach(function(n){ document.getElementById(n).classList.add('hidden'); });
+  document.getElementById(id).classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function toast(msg){
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ el.classList.remove('show'); }, 2600);
+}
+function goHome(){
+  clearTimers();
+  agentRunning = false;
+  state = { q1:'', q2:'', convBuilt:false };
+  var inp = document.getElementById('askInput');
+  if(inp) inp.value = '今天怎么突然跌这么多？';
+  showScreen('screenAsk');
+}
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function setAsk(t){ document.getElementById('askInput').value = t; }
+
+/* ---------- Screen 2 · Agent Plan & Tool 数据 ---------- */
+var PLAN = [
+  { t:'Load User Context', d:'读取自选股与浏览上下文（不推断持仓）',
+    logs:[
+      ['Browsing Context','读取自选股：凌云科技（LYTE）及行业关注范围'],
+      ['Browsing Context','读取浏览记录：凌云科技为近 7 日浏览频次最高的标的'],
+      ['Browsing Context','明确边界：自选股 ≠ 已持仓，不把浏览行为当作投资假设']
+    ]},
+  { t:'Fetch Market & Information', d:'多源获取实时/历史行情、财经新闻与公司公告',
+    logs:[
+      ['Market Data','实时行情 GET quote?symbol=LYTE → 200 · 今日收跌 6.2%'],
+      ['Market Data','实时行情：算力/服务器板块同步回落约 -1.5% ~ -3%'],
+      ['Historical Market Data','加载近 30 日历史行情：今日量价特征偏离历史常态'],
+      ['Financial News','财经新闻检索（近 24 小时）：命中 15 条，含业绩会报道与市场传闻'],
+      ['Company Announcements','公司公告：当日正式公告 0 条；业绩交流会纪要 1 份（9/8 盘后）'],
+      ['Browsing Context','浏览记录命中：用户近期浏览过该公司订单与业绩相关资讯'],
+      ['Financial News','初步收集原始信息：27 条（财经新闻 / 公司公告 / 行情）']
+    ]},
+  { t:'Deduplicate', d:'识别同源转载，移除重复信息',
+    logs:[
+      ['Financial News','检测同源转载：毛利率指引相关报道被 11 家媒体转写'],
+      ['Financial News','标题与正文相似度 > 92%，判定为转载，仅保留最早权威源'],
+      ['Financial News','结果：27 → 16 条（移除重复 11 条）']
+    ]},
+  { t:'Filter Noise & Keep Candidates', d:'按噪音过滤维度筛出候选信号（此步先不下“多重要”结论）',
+    logs:[
+      ['Financial News','过滤维度（Noise Filtering）：Relevance 相关 / Info Gain 增量 / Source Quality 信源 / Timeliness 时效'],
+      ['Financial News','低相关过滤：观点型 / 二次解读资讯 7 条 + 行业弱相关资讯 5 条'],
+      ['Financial News','结果：16 → 4 条候选信号进入证据验证（过滤 12 条）']
+    ]},
+  { t:'Verify Evidence', d:'对保留信号做证据状态分级',
+    logs:[
+      ['Verify','Signal #1 毛利率指引 → CONFIRMED FACT（业绩交流会为公司原始披露）'],
+      ['Verify','Signal #2 交付传闻 → UNVERIFIED CLAIM（仅财经媒体转述，公司未公告）'],
+      ['Verify','Signal #3 / #4 → CONFIRMED（实时行情 / 历史行情结构化数据）']
+    ]},
+  { t:'Materiality & Impact Analysis', d:'在证据验证之后排重要性，再构建影响路径与不确定性分层',
+    logs:[
+      ['Analyze','Materiality（验证之后）：仅对已验证 / 明确标注未确认的候选信号排重要性，高影响 Signal #1 置顶'],
+      ['Analyze','影响路径（假设性）：毛利率指引下修 → 远期盈利预期调整 → 今日 -6.2%；时间与方向高度一致，但公开信息无法进一步证明因果'],
+      ['Analyze','输出分层：CONFIRMED FACT / UNVERIFIED CLAIM / INTERPRETATION / UNCERTAINTY'],
+      ['Analyze','保留 Material Signals：4 条（噪音 23 条已过滤，且逐条给出 Why retained）']
+    ]}
+];
+
+var TOOLS = ['Market Data','Historical Market Data','Financial News','Company Announcements','User Watchlist / Browsing Context'];
+
+function tagClass(name){
+  if(name==='Market Data') return 'tg-blue';
+  if(name==='Financial News') return 'tg-green';
+  if(name==='Company Announcements') return 'tg-purple';
+  if(name==='Historical Market Data') return 'tg-teal';
+  if(name==='Browsing Context' || name==='User Watchlist / Browsing Context') return 'tg-orange';
+  if(name==='Verify') return 'tg-slate';
+  if(name==='Analyze') return 'tg-blue';
+  if(name==='Agent') return 'tg-purple';
+  return 'tg-slate';
+}
+function resolveTool(tag){
+  if(TOOLS.indexOf(tag) >= 0) return tag;
+  if(tag === 'Browsing Context') return 'User Watchlist / Browsing Context';
+  return null;
+}
+
+function setToolState(name, st){
+  var idx = TOOLS.indexOf(name);
+  if(idx < 0) return;
+  var el = document.getElementById('tool-' + idx);
+  if(!el) return;
+  el.classList.remove('live','done');
+  if(st==='live') el.classList.add('live');
+  if(st==='done') el.classList.add('done');
+}
+function toolId(name){ return TOOLS.indexOf(name); }
+
+function renderAgentShell(){
+  var planHtml = PLAN.map(function(p,i){
+    return '<div class="plan-item" id="plan-'+i+'">'+
+             '<span class="pdot">'+(i+1)+'</span>'+
+             '<div class="pt"><b>'+p.t+'</b><span>'+p.d+'</span></div>'+
+             '<span class="pstate" id="pstate-'+i+'">待执行</span>'+
+           '</div>';
+  }).join('');
+  document.getElementById('planList').innerHTML = planHtml;
+
+  var chipHtml = TOOLS.map(function(t,i){
+    return '<span class="tchip" id="tool-'+i+'"><span class="td"></span>'+t+'</span>';
+  }).join('');
+  document.getElementById('toolChips').innerHTML = chipHtml;
+  document.getElementById('toolLog').innerHTML = '';
+}
+
+function setPlanState(i, st){
+  var item = document.getElementById('plan-'+i);
+  var lab  = document.getElementById('pstate-'+i);
+  if(!item) return;
+  item.classList.remove('running','done');
+  if(st==='running'){ item.classList.add('running'); lab.textContent = '进行中'; }
+  else if(st==='done'){ item.classList.add('done'); lab.textContent = '完成 ✓'; }
+}
+
+function logLine(tag, msg){
+  var box = document.getElementById('toolLog');
+  var row = document.createElement('div');
+  row.className = 'lrow';
+  row.innerHTML = '<span class="tag '+tagClass(tag)+'">'+esc(tag)+'</span><span class="msg">'+esc(msg)+'</span>';
+  box.appendChild(row);
+  box.scrollTop = box.scrollHeight;
+}
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function setNow(txt){ document.getElementById('agentNow').textContent = txt; }
+
+function runAgentSteps(){
+  function step(i){
+    if(!agentRunning) return;
+    if(i >= PLAN.length){ finishAgent(); return; }
+    var p = PLAN[i];
+    setPlanState(i,'running');
+    setNow('Step '+(i+1)+'/6 · '+p.t);
+    document.getElementById('agentPct').textContent = Math.round(i/6*100)+'%';
+    logLine('Agent','▸ 开始步骤 '+(i+1)+': '+p.t+' · '+p.d);
+    logLine('Agent','────────────────────────────────');
+    var delay = 750;
+    p.logs.forEach(function(l, j){
+      var tk = resolveTool(l[0]);
+      if(tk){ tick((function(t){ return function(){ setToolState(t,'live'); }; })(tk), delay + j*380); }
+      tick((function(t,m){ return function(){ logLine(t,m); }; })(l[0], l[1]), delay + j*380 + 120);
+    });
+    var total = delay + p.logs.length*380 + 420;
+    tick(function(){
+      setPlanState(i,'done');
+      p.logs.forEach(function(l){ var tk = resolveTool(l[0]); if(tk) setToolState(tk,'done'); });
+      document.getElementById('agentPct').textContent = Math.round((i+1)/6*100)+'%';
+      setNow('Step '+(i+1)+'/6 完成 · '+p.t);
+      tick(function(){ step(i+1); }, 180);
+    }, total);
+  }
+  step(0);
+}
+
+function startAgent(){
+  clearTimers();
+  agentRunning = true;
+  var q = document.getElementById('askInput').value.trim();
+  if(!q) q = '今天怎么突然跌这么多？';
+  state.q1 = q;
+  state.convBuilt = false;
+
+  var spinner = document.getElementById('agentSpinner');
+  spinner.style.animation = '';
+  spinner.style.borderTopColor = '';
+
+  renderAgentShell();
+  document.getElementById('askQ').textContent = q;
+  document.getElementById('statsBand').classList.remove('show');
+  document.getElementById('agentNow').textContent = '准备开始…';
+  document.getElementById('agentPct').textContent = '';
+  showScreen('screenAgent');
+  logLine('Agent','已接收问题：「'+q+'」');
+  logLine('Agent','启动 6 步分析计划，调用 5 类工具…');
+  runAgentSteps();
+}
+
+function toggleSpeed(){
+  speed = (speed === 1) ? 4 : 1;
+  document.getElementById('btnSpeed').textContent = (speed===1) ? '动画加速 ×4' : '恢复 1× 速度';
+}
+
+function finishAgent(){
+  agentRunning = false;
+  agentFinished = true;
+  setNow('执行完成 · 4 条 Material Signals 已保留');
+  document.getElementById('agentPct').textContent = '100%';
+  var spinner = document.getElementById('agentSpinner');
+  spinner.style.borderTopColor = '#fff';
+  spinner.style.animation = 'none';
+  logLine('Agent','══ 执行完成 ══');
+  logLine('Agent','结果：27 条原始信息 → 23 条噪音已过滤 → 保留 4 条关键信号');
+
+  var stats = document.querySelectorAll('#statsBand .stat .v');
+  stats.forEach(function(el){
+    var target = parseInt(el.getAttribute('data-count'),10);
+    el.textContent = target;
+  });
+  document.getElementById('statsBand').classList.add('show');
+  document.getElementById('statsBand').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function goToMatters(){ renderMatters(); showScreen('screenMatters'); }
+
+/* ---------- Screen 3 · Signals 数据 ---------- */
+var SIGNALS = [
+  {
+    num:'1', hot:true,
+    pills:[{t:'重点 Signal',c:'st-hot'},{t:'CONFIRMED FACT · 公司原始披露',c:'st-blu'}],
+    title:'公司下调全年毛利率指引',
+    summary:'9 月 8 日盘后业绩交流会中，公司把 2026 全年毛利率指引由 28%–30% 下修至 25%–26%，开盘前已被财经媒体报道扩散。',
+    whyRetained:'公司直接披露 · 新增信息 · 直接影响盈利预期',
+    facts:[
+      {
+        text:'公司管理层在 9 月 8 日盘后业绩交流会中，将 2026 全年毛利率指引由 28%–30% 下修至 25%–26%。',
+        sources:[
+          { kind:'official', name:'凌云科技 · 业绩交流会纪要（公司披露）', type:'公司披露 · 会议纪要', time:'2026-09-08 19:40',
+            quote:'管理层表示：受原材料成本上升及部分项目竞争性定价影响，预计全年毛利率落于 25%–26% 区间，较此前指引有所下修。' },
+          { kind:'media', name:'财经媒体 · 业绩会报道', type:'财经新闻', time:'2026-09-09 08:12',
+            quote:'据公司 9 月 8 日业绩交流会披露：全年毛利率指引下修至 25%–26%，收入与新增订单指引维持不变。' }
+        ]
+      },
+      {
+        text:'公司同步维持全年收入与新增订单指引不变。',
+        sources:[
+          { kind:'official', name:'凌云科技 · 业绩交流会纪要（公司披露）', type:'公司披露 · 会议纪要', time:'2026-09-08 19:40',
+            quote:'纪要第二部分：全年收入指引与新增订单指引均维持不变，仅毛利率指引下修。' }
+        ]
+      }
+    ],
+    interpretation:'毛利率指引下修意味着远期盈利预期被压缩——这是市场此前乐观假设中较脆弱的一环。需要说明的是：下修与今日下跌在时间与方向上高度一致，是当前公开信息支持度最高的公司层面解释之一；但仅凭公开市场信息，无法证明它解释了全部跌幅，也无法判定它是「一次性成本冲击」还是「定价能力趋势性走弱」。这些都需要后续财报验证。',
+    uncertainties:[
+      '毛利率下修是一次性成本冲击，还是定价/竞争压力的趋势性走弱——需后续季度实际毛利率验证',
+      '公司没有披露下修对单季度或全年利润的量化影响',
+      '收入与订单指引「维持不变」本身也需要后续兑现来检验',
+      '即便信号方向明确，也无法从公开信息推断其对今日全部跌幅的贡献比例'
+    ]
+  },
+  {
+    num:'2', hot:false,
+    pills:[{t:'UNVERIFIED CLAIM · 未证实信息',c:'st-amb'},{t:'传播度高 · 来源置信度低',c:'st-amb'}],
+    title:'传闻：大客户订单「交付节奏可能延后」',
+    summary:'市场讨论中出现「部分大客户订单交付节奏可能延后」的说法，经财经媒体转述传播；公司未公告、未确认，今日讨论度快速上升。',
+    whyRetained:'传播度高 · 可能影响收入确认节奏 · 但为单一非官方来源、未获公司确认',
+    facts:[],
+    unverified:{
+      claim:'市场出现「凌云科技某云厂商大客户部分订单交付节奏可能延后」的说法；该说法不是公司公告。',
+      verification:[
+        '该说法由财经媒体转述市场讨论而来，并非公司公告或官方发布',
+        '检索公司公告与官方披露渠道，未发现对该说法的任何确认或否认',
+        '目前为单一非官方来源，暂无其他独立可靠来源印证'
+      ],
+      treatment:'可用于解释今日市场情绪与讨论热度的一部分来源；但不能作为已经发生的公司事实，也不应与 Signal #1 的已确认信息混用。',
+      sources:[
+        { kind:'media', name:'财经媒体 · 市场传闻转述', type:'财经新闻', time:'2026-09-09 09:24',
+          quote:'市场出现关于凌云科技部分大客户交付节奏可能调整的讨论，具体影响尚不明确。' },
+        { kind:'record', name:'凌云科技 · 公司公告检索', type:'公司公告 · 检索记录', time:'2026-09-09 15:00',
+          quote:'截至当前，未检索到公司对「大客户交付节奏延后」相关说法的确认或澄清公告。' }
+      ]
+    },
+    interpretation:'如果该说法属实，订单交付节奏后移可能影响短期收入确认节奏，与毛利率下修形成潜在的叠加利空——这是它能解释今日部分市场情绪的原因，也是最需要后续澄清的方向。但注意：它目前只是市场传闻，SignalLens 将其明确归为 UNVERIFIED CLAIM，而不是已发生的事实。',
+    uncertainties:[
+      '传闻是否属实：客户是否真实调整了交付排期',
+      '涉及订单金额与收入占比有多大',
+      '公司是否会在正式渠道证实或澄清该说法'
+    ]
+  },
+  {
+    num:'3', hot:false,
+    pills:[{t:'CONFIRMED FACT · 行情数据',c:'st-blu'},{t:'板块联动',c:'st-blu'}],
+    title:'板块整体回调，但凌云跌幅显著更大',
+    summary:'今日 AI 算力 / 服务器相关板块整体回落约 1.5%–3%，凌云科技收盘跌幅明显大于板块均值。',
+    whyRetained:'用于区分「行业共振」与「个股特异影响」两种解释',
+    facts:[
+      {
+        text:'今日 AI 算力 / 服务器板块整体下跌约 1.5%–3%，多只同业个股同步走低。',
+        sources:[
+          { kind:'market', name:'实时行情 · 板块指数', type:'行情数据 · 板块', time:'2026-09-09 15:00',
+            quote:'算力设备板块指数收盘约 -2.1%；板块内多数成分股下跌。' }
+        ]
+      },
+      {
+        text:'凌云科技收盘跌幅 -6.2%，显著大于板块均值（约 -2%）。',
+        sources:[
+          { kind:'market', name:'实时行情 · 个股快照（LYTE）', type:'行情数据', time:'2026-09-09 15:00',
+            quote:'凌云科技（LYTE）收盘 -6.2%，跌幅明显大于板块均值。' }
+        ]
+      }
+    ],
+    interpretation:'板块系统性回调不足以单独解释凌云 -6.2% 的全部跌幅（板块均值约 -2%）。凌云明显跑输板块，说明公司层面的事件可能贡献了额外压力；但「板块与个股同时下跌」并不自动等同于「公司事件完全导致了个股全部跌幅」，仍需结合其他证据综合判断。',
+    uncertainties:[
+      '板块回调是情绪性波动，还是行业景气预期变化的前兆',
+      '个股与板块的分化在未来几日是收敛还是继续扩大'
+    ]
+  },
+  {
+    num:'4', hot:false,
+    pills:[{t:'CONFIRMED FACT · 行情数据',c:'st-blu'},{t:'量价异动 · 待后续验证',c:'st-amb'}],
+    title:'今日跌幅与成交量明显偏离近 30 日常态',
+    summary:'凌云科技今日收跌 6.2%，成交量约为近 30 日日均成交量的 1.8 倍，属于明显的量价双偏离。',
+    whyRetained:'量价偏离历史常态程度显著（成交量约 1.8×），说明本次事件对应的市场反应强度明显高于近期常态',
+    facts:[
+      {
+        text:'凌云科技今日收跌 6.2%。',
+        sources:[
+          { kind:'market', name:'实时行情 · 个股快照（LYTE）', type:'行情数据', time:'2026-09-09 15:00',
+            quote:'LYTE 今日收盘下跌 6.2%。' }
+        ]
+      },
+      {
+        text:'今日成交量约为近 30 日日均成交量的 1.8 倍。',
+        sources:[
+          { kind:'market', name:'历史行情 · 近 30 日成交量统计', type:'历史行情数据', time:'2026-09-09 15:00',
+            quote:'近 30 日日均成交量按历史行情计算，今日成交量为该均值的约 1.8 倍。' }
+        ]
+      }
+    ],
+    interpretation:'价格下跌同时伴随成交量明显放大，说明本次异动获得了较高的市场参与度，而不是低成交量下的偶发价格波动。需要强调：仅凭行情数据只能确认市场反应强度与交易活跃度明显偏离近期常态，无法判断交易主体是谁，也无法判断这种反应会持续多久。',
+    uncertainties:[
+      '异常交易强度是一次性事件反应，还是持续性趋势——需后续交易日验证',
+      '若成交量在随后数个交易日快速回落至常态，更可能是一次性反应；若持续放大，则需要进一步关注'
+    ]
+  }
+];
+
+var NOISE = {
+  dup:{
+    name:'重复转载', count:11,
+    why:'同一信息源被多家媒体/平台转写。它们不增加任何新的可验证事实，合并后只保留最早、最权威的一条。',
+    items:[
+      { t:'凌云科技下调全年毛利率指引', meta:'新浪财经 · 09-09 09:20', why:'与《业绩交流会纪要》同源，无新增事实，属转载扩散' },
+      { t:'凌云科技：毛利率指引降至 25%–26%', meta:'同花顺资讯 · 09-09 09:12', why:'与纪要原文重复，去重后合并为同一条' },
+      { t:'凌云下调全年毛利率目标，收入指引不变', meta:'东方财富 · 09-09 09:41', why:'同源改写，核心事实已被 Signal #1 覆盖' },
+      { t:'凌云科技业绩会要点速递', meta:'腾讯自选股 · 09-09 08:35', why:'基于同一份纪要的二次创作，无增量事实' }
+    ]
+  },
+  social:{
+    name:'观点型 / 二次解读资讯 · 无新增事实', count:7,
+    why:'观点型文章与对行情的二次解读，不含新的公司事实或可验证数据；此类内容来自财经新闻资讯渠道（财经媒体的报道、观点与评论栏目），无法为证据核验提供独立支撑。',
+    items:[
+      { t:'「凌云科技今日大跌，后市怎么看？」', meta:'财经媒体观点栏目 · 09-09 10:12', why:'观点型文章，没有新增公司事实或数据' },
+      { t:'「凌云科技还能不能反弹？」', meta:'财经资讯二次解读 · 09-09 10:30', why:'主要为行情评论，没有新增可验证事实' },
+      { t:'「AI 服务器板块进入调整期？」', meta:'财经媒体评论 · 09-09 11:05', why:'行业观点，与当前个股事件没有新增直接证据' },
+      { t:'「高增长的故事还能持续吗？」', meta:'财经媒体观点栏目 · 09-09 11:40', why:'观点探讨，无增量事实信息' }
+    ]
+  },
+  weak:{
+    name:'行业信息 · 与标的关系弱', count:5,
+    why:'关联链路过长或主体不匹配：无法从现有披露中建立对凌云科技基本面的直接、可验证影响。',
+    items:[
+      { t:'海外某云厂商被传考虑调整资本开支', meta:'行业资讯 · 09-09 08:50', why:'主体为海外客户且属传闻，与凌云现有订单无直接可验证关联' },
+      { t:'某上游芯片公司上调 AI 收入指引', meta:'行业资讯 · 09-09 09:05', why:'影响主体是上游公司，传导链条过长，无法直接改变凌云本次判断' },
+      { t:'算力服务器 GPU 价格周报更新', meta:'行业资讯 · 09-09 09:30', why:'行业上游价格数据，与凌云个股基本面判断无强关联' }
+    ]
+  }
+};
+
+function sigHtml(s){
+  var body = '';
+  if(s.facts && s.facts.length){
+    body += '<div class="fiu fact"><div class="h"><span class="bx">✓</span>CONFIRMED FACT · 已确认事实</div>';
+    s.facts.forEach(function(f, fi){
+      var srcCount = f.sources.length;
+      var hasOfficial = f.sources.some(function(so){ return so.kind === 'official'; });
+      body += '<div class="fact-item"><div class="ft"><span class="fi">'+(fi+1)+'</span><span>'+f.text+'</span></div>'+
+              '<div class="src-row">'+
+                '<span class="src-btn" onclick="openSource('+s.num+','+fi+')">查看来源</span>'+
+                '<span class="src-btn" style="border-color:var(--line);color:var(--muted);cursor:default">'+(hasOfficial?'含公司原始披露 · ':'')+'已绑定 '+srcCount+' 个来源</span>'+
+              '</div></div>';
+    });
+    body += '</div>';
+  }
+  if(s.unverified){
+    body += '<div class="fiu claim"><div class="h"><span class="bx">!</span>UNVERIFIED CLAIM · 未证实信息</div>'+
+            '<div class="claim-note">当前未证实，不应视为已发生事实。</div>'+
+            '<div class="claim-row"><div class="cr-t">CLAIM · 市场说法</div><p>'+s.unverified.claim+'</p></div>'+
+            '<div class="claim-row"><div class="cr-t">VERIFICATION STATUS · 核验状态</div><ul>'+
+              s.unverified.verification.map(function(v){ return '<li>'+v+'</li>'; }).join('')+'</ul></div>'+
+            '<div class="claim-row"><div class="cr-t">CURRENT TREATMENT · 当前处理方式</div><p>'+s.unverified.treatment+'</p></div>'+
+            '<div class="src-row" style="margin-left:2px"><span class="src-btn warn" onclick="openClaimSource('+s.num+')">查看来源与核验记录</span></div>'+
+            '</div>';
+  }
+  if(s.conflicting){
+    body += '<div class="fiu conflict"><div class="h"><span class="bx">!</span>CONFLICTING EVIDENCE · 来源冲突</div>'+
+            '<div class="claim-note">来源存在冲突，需要进一步核验，不强行选择结论。</div>'+
+            '<div class="claim-row"><p>'+s.conflicting+'</p></div></div>';
+  }
+
+  var pills = s.pills.map(function(p){ return '<span class="st-pill '+p.c+'">'+p.t+'</span>'; }).join('');
+
+  var unHtml = '<div class="fiu uncer"><div class="h"><span class="bx">?</span>UNCERTAINTY · 尚不确定</div>'+
+               '<ul class="uncer-list">'+s.uncertainties.map(function(u){ return '<li>'+u+'</li>'; }).join('')+'</ul></div>';
+
+  return '<details class="sig'+(s.hot?' hot':'')+'"'+(s.hot?' open':'')+'>'+
+    '<summary>'+
+      '<div class="sig-num">'+s.num+'</div>'+
+      '<div class="sig-main">'+
+        '<div class="sig-top">'+pills+'</div>'+
+        '<div class="sig-title">'+s.title+'</div>'+
+        '<div class="sig-sum">'+s.summary+'</div>'+
+        (s.whyRetained ? '<div class="why-ret"><b>Why retained</b> · '+s.whyRetained+'</div>' : '')+
+      '</div>'+
+      '<span class="sig-toggle">+</span>'+
+    '</summary>'+
+    '<div class="sig-body">'+
+      body +
+      '<div class="fiu interp"><div class="h"><span class="bx">AI</span>INTERPRETATION · AI 分析（我的判断）</div><p>'+s.interpretation+'</p></div>'+
+      unHtml +
+    '</div>'+
+  '</details>';
+}
+
+function renderMatters(){
+  var list = document.getElementById('signalsList');
+  list.innerHTML = SIGNALS.map(sigHtml).join('');
+
+  var conv = document.getElementById('convLog');
+  conv.innerHTML = '';
+  var u = document.createElement('div');
+  u.className = 'msg u';
+  u.textContent = state.q1 || '今天怎么突然跌这么多？';
+  conv.appendChild(u);
+  var a = document.createElement('div');
+  a.className = 'msg a';
+  a.innerHTML = '我把今天围绕 <b>凌云科技</b> 的 27 条信息全部处理了一遍：先做去重与噪音过滤，'+
+                '其中 <b>23 条是噪音</b>（重复转载 / 无新增事实的观点与二次解读 / 弱相关行业信息），保留 4 条候选信号；'+
+                '随后进行 <b>Evidence Verification</b>（每条都带来源与证据状态）与验证后的 <b>Materiality 排序</b>。'+
+                '下方信号卡按 <b>CONFIRMED FACT / UNVERIFIED CLAIM / INTERPRETATION / UNCERTAINTY</b> 分层，并标注 <b>Why retained</b>；'+
+                '已确认事实都可点开核对来源，未证实信息会明确标记。';
+  conv.appendChild(a);
+  conv.scrollTop = conv.scrollHeight;
+}
+
+function findSignal(num){
+  for(var i=0;i<SIGNALS.length;i++){ if(String(SIGNALS[i].num) === String(num)) return SIGNALS[i]; }
+  return null;
+}
+function profileLabel(so){
+  if(so.kind === 'official') return '<span class="s-primary">PRIMARY SOURCE · 公司原始披露</span>';
+  if(so.kind === 'market') return '<span class="s-market">MARKET DATA · 行情数据</span>';
+  if(so.kind === 'record') return '<span class="s-unveri">SEARCH RECORD · 检索记录（未发现披露）</span>';
+  return '';
+}
+function evidenceSummary(sources){
+  if(!sources || !sources.length) return { pill:'ev-unverified', label:'NO SOURCES · 暂无来源',
+    line:'当前尚未绑定任何可核验来源，不能视为已确认事实。' };
+  var hasOfficial = sources.some(function(s2){ return s2.kind === 'official'; });
+  var allMarket   = sources.length > 0 && sources.every(function(s2){ return s2.kind === 'market'; });
+  var anyMedia    = sources.some(function(s2){ return s2.kind === 'media'; });
+  var onlyRecord  = sources.length > 0 && sources.every(function(s2){ return s2.kind === 'record'; });
+
+  if(hasOfficial){
+    var mediaNote = anyMedia ? ' 另有财经媒体对该原始披露进行了转述——媒体转载不能作为独立验证。' : '';
+    return { pill:'ev-confirmed', label:'CONFIRMED FACT · PRIMARY SOURCE CONFIRMED',
+      line:'该事实由公司原始披露 / 公司公告（PRIMARY SOURCE）直接确认。'+mediaNote };
+  }
+  if(allMarket){
+    return { pill:'ev-confirmed', label:'CONFIRMED FACT · MARKET DATA VERIFIED',
+      line:'该事实由实时 / 历史结构化行情记录直接核对，属于可复现的记录型数据。' };
+  }
+  if(onlyRecord){
+    return { pill:'ev-unverified', label:'SEARCH RECORD ONLY · 仅检索记录',
+      line:'当前只有「未发现相关披露」的检索记录，没有任何来源正面证实该表述，不能视为已确认事实。' };
+  }
+  /* 仅媒体来源：来源数量 ≠ 独立证据数量，不因条数≥1 自动升级为 Confirmed */
+  var n = sources.length;
+  var multiNote = (n > 1) ? '（共 '+n+' 条，可能为同源转载）' : '';
+  return { pill:'ev-unverified', label:'MEDIA REPORT · 尚无 PRIMARY SOURCE 验证',
+    line:'当前仅有财经媒体报道'+multiNote+'，尚无公司原始披露或结构化行情记录支撑。媒体转载 / 转述不能自动视为已确认事实。' };
+}
+function renderFactsSources(sigNum, factIdx){
+  var s = findSignal(sigNum);
+  if(!s) return;
+  var f = s.facts[factIdx];
+  if(!f) return;
+  var sum = evidenceSummary(f.sources);
+  var body = document.getElementById('srcBody');
+  body.innerHTML =
+    '<div class="facthead"><span class="fk">'+s.num+'.'+(factIdx+1)+'</span> FACT · 需要核验的事实陈述</div>'+
+    '<div class="s-fact">'+esc(f.text)+'</div>'+
+    '<div class="ev-status"><span class="ev-pill '+sum.pill+'">'+sum.label+'</span></div>'+
+    '<div class="ev-note">验证状态：'+sum.line+'</div>';
+
+  var sec = document.createElement('div');
+  sec.className = 'm-sec';
+  var st = document.createElement('div');
+  st.className = 'ms-t';
+  st.textContent = '该事实对应的来源（'+f.sources.length+' 个）';
+  sec.appendChild(st);
+  f.sources.forEach(function(so){
+    var card = document.createElement('div');
+    card.className = 'src-card';
+    card.innerHTML = '<div class="s-top"><span class="s-name">'+esc(so.name)+'</span><span class="s-type">'+esc(so.type)+'</span><span class="s-time">'+esc(so.time)+'</span></div>'+
+                     profileLabel(so)+
+                     '<blockquote class="s-quote">'+esc(so.quote)+'</blockquote>';
+    sec.appendChild(card);
+  });
+  body.appendChild(sec);
+
+  document.getElementById('srcTitle').textContent = '来源核验 · Signal #'+s.num+' · '+s.title;
+  openModal('overlaySource');
+}
+function openSource(sigNum, factIdx){ renderFactsSources(sigNum, factIdx); }
+
+function renderClaimSources(sigNum){
+  var s = findSignal(sigNum);
+  if(!s || !s.unverified) return;
+  var body = document.getElementById('srcBody');
+  var html =
+    '<div class="facthead" style="color:#8A4A00"><span class="fk" style="background:var(--amber)">!</span> UNVERIFIED CLAIM · 未证实信息</div>'+
+    '<div class="ev-status"><span class="ev-pill ev-unverified">UNVERIFIED · 未证实</span></div>'+
+    '<div class="ev-note"><b>验证状态：</b>目前仅有财经媒体转述 / 非官方来源，尚未获得公司公开披露确认。当前不应视为已发生事实。</div>';
+
+  html += '<div class="m-sec"><div class="ms-t">CLAIM · 市场说法</div><div class="s-fact">'+esc(s.unverified.claim)+'</div></div>';
+
+  html += '<div class="m-sec"><div class="ms-t">VERIFICATION STATUS · 核验状态</div><ul class="uncer-list" style="margin-left:0">'+
+          s.unverified.verification.map(function(v){ return '<li>'+esc(v)+'</li>'; }).join('')+'</ul></div>';
+
+  html += '<div class="m-sec"><div class="ms-t">当前与该说法相关的来源 / 检索记录（'+s.unverified.sources.length+' 项）</div>';
+  s.unverified.sources.forEach(function(so){
+    var badge = (so.kind === 'record')
+      ? '<span class="s-unveri">SEARCH RECORD · 检索记录（未发现披露）</span>'
+      : '<span class="s-unveri">UNVERIFIED · 非官方来源</span>';
+    html += '<div class="src-card"><div class="s-top"><span class="s-name">'+esc(so.name)+'</span><span class="s-type">'+esc(so.type)+'</span><span class="s-time">'+esc(so.time)+'</span></div>'+
+            badge+
+            '<blockquote class="s-quote">'+esc(so.quote)+'</blockquote></div>';
+  });
+  html += '</div>';
+
+  html += '<div class="m-sec"><div class="ms-t">CURRENT TREATMENT · 当前处理方式</div>'+
+          '<div class="ev-note" style="margin-top:0">'+esc(s.unverified.treatment)+'</div></div>';
+
+  body.innerHTML = html;
+  document.getElementById('srcTitle').textContent = '来源核验 · Signal #'+s.num+' · UNVERIFIED CLAIM · 未证实信息';
+  openModal('overlaySource');
+}
+function openClaimSource(sigNum){ renderClaimSources(sigNum); }
+
+function renderNoise(){
+  var body = document.getElementById('noiseBody');
+  body.innerHTML = '';
+  var p0 = document.createElement('div');
+  p0.className = 'noise-principle';
+  p0.innerHTML = '<b>原则 · Filtered ≠ False</b><br>'+
+                 '一条信息被过滤，可能只是因为它<b>重复</b>、<b>与当前标的相关性弱</b>或<b>没有新增事实</b>——并不代表它一定是假信息。'+
+                 '<b>反方观点 ≠ Noise</b>：只要相关、可信、有增量，即使与主流或你的原有判断相反也会保留。'+
+                 '重要性（Materiality）的最终排序在证据验证之后才进行，Agent 不会宣称「这些内容都没有价值」。';
+  body.appendChild(p0);
+  var keys = ['dup','social','weak'];
+  keys.forEach(function(k){
+    var c = NOISE[k];
+    var sec = document.createElement('div');
+    sec.className = 'noise-cat';
+    var head = document.createElement('div');
+    head.className = 'nc-head';
+    head.innerHTML = '<span class="nc-t">'+c.name+'</span><span class="nc-c">'+c.count+' 条</span>'+
+                     '<span class="nc-why">为何过滤：'+c.why+'</span>';
+    sec.appendChild(head);
+    c.items.forEach(function(it){
+      var itEl = document.createElement('div');
+      itEl.className = 'noise-item';
+      itEl.innerHTML = '<div class="ni-t">'+esc(it.t)+'</div>'+
+                       '<div class="ni-meta">'+esc(it.meta)+'</div>'+
+                       '<div class="ni-why"><b>Why filtered：</b>'+esc(it.why)+'</div>';
+      sec.appendChild(itEl);
+    });
+    var more = document.createElement('div');
+    more.style.cssText = 'font-size:11px;color:var(--faint);margin-top:-4px';
+    more.textContent = '… 以上为该类别的代表性示例，其余条目过滤逻辑一致。';
+    sec.appendChild(more);
+    body.appendChild(sec);
+  });
+  openModal('overlayNoise');
+}
+function openNoise(){ renderNoise(); }
+
+/* ---------- 追问 / Buy-Sell ---------- */
+function askFromMatters(q){
+  if(!q) return;
+  var conv = document.getElementById('convLog');
+  var u = document.createElement('div');
+  u.className = 'msg u';
+  u.textContent = q;
+  conv.appendChild(u);
+  var inp = document.getElementById('mattersInput');
+  if(inp) inp.value = '';
+  conv.scrollTop = conv.scrollHeight;
+
+  if(isDecisionQuestion(q)){
+    state.q2 = q;
+    tick(function(){ enterDecision(q); }, 260);
+  } else {
+    tick(function(){
+      var a = document.createElement('div');
+      a.className = 'msg a';
+      a.innerHTML = canned(q);
+      conv.appendChild(a);
+      conv.scrollTop = conv.scrollHeight;
+    }, 320);
+  }
+}
+function sendMattersAsk(){
+  var inp = document.getElementById('mattersInput');
+  if(!inp) return;
+  var q = inp.value.trim();
+  if(!q){ toast('请输入问题，或点击上方快捷问题'); return; }
+  askFromMatters(q);
+}
+function isDecisionQuestion(q){
+  var s = q.replace(/\s/g,'');
+  var buy=/能买吗|该买吗|要不要买|值不值得买|值得买吗|可以买吗|适合买吗|该不该买|买不买|现在能上车吗|上车吗|抄底|加仓|补仓|买入/.test(s);
+  var sell=/该卖吗|要不要卖|该不该卖|值不值得卖|卖不卖|是不是应该卖|该不该抛|清仓|减仓|割肉|离场|止盈|止损|跑不跑|要不要跑|该不该跑|卖出|抛售|要不要走|该不该走/.test(s);
+  var ops=/怎么操作|给个建议|给我个建议|该怎么交易|买还是卖|是走是留|如何交易/.test(s);
+  var predict=/目标价|能涨到多少|还能涨多少|会跌到多少|能涨吗|还会涨吗|会跌吗|涨到多少|跌到多少|明天.*(涨|跌)|未来(涨不涨|会不会涨|会不会跌)/.test(s);
+  var hold=/要不要继续持有|该继续持有吗|还能拿吗|要不要拿着|继续拿吗|持有还是卖|要不要观望|现在该怎么办|该不该继续持有|还能不能拿|是持有还是|拿还是放/.test(s);
+  return buy || sell || ops || predict || hold;
+}
+function canned(q){
+  if(/毛利率|影响多大|为什么跌|跌多少/.test(q)){
+    return '直接看 Signal #1：<b>毛利率指引下修</b>与今日下跌在时间与方向上高度一致，是当前公开信息支持度最高的公司层面解释；'+
+           '但它无法证明自己解释了全部跌幅。<b>这是一次性成本冲击，还是定价能力趋势性走弱</b>，仍需后续季度财报验证——这些我不会替你下结论。';
+  }
+  if(/警惕|风险|观察|注意/.test(q)){
+    return '建议重点观察：① 三季报实际毛利率是否落在新的 25%–26% 指引区间内；② 「大客户交付延后」这类未证实说法（UNVERIFIED CLAIM）后续是否被证实或澄清；③ 接下来交易日的成交量是否回落至常态；④ 板块情绪是否企稳。以上都对应各信号卡的 Uncertainty 与 Decision Support 的观察清单。';
+  }
+  return '这是个好问题。为了不把推断包装成事实，建议你先在信号卡里对照 <b>CONFIRMED FACT / UNVERIFIED CLAIM / INTERPRETATION / UNCERTAINTY</b> 的分层，核对来源与不确定性。'+
+         '如果你关心的是「哪些情况会缓解或加剧当前风险」，可以直接问我，我会切换到 Decision Support 模式。';
+}
+
+/* ---------- Screen 4 · Decision Support ---------- */
+var PERIODS = {
+  near:{
+    label:'未来几天',
+    note:'以「事件与情绪消化」为视角：关注这次下跌带来的影响是否正在被市场消化；不做涨跌预测。',
+    relief:[
+      '若公司发布公告或官方说明，正面回应毛利率下修与「交付延后」的说法，则相关不确定性有望下降',
+      '若后续成交量逐步回落至常态、价格波动幅度同步收窄，则说明本次事件引发的交易活跃度和短期波动正在缓和',
+      '若未出现新的实质性负面信息（如订单取消、财务异动），则紧张情绪进一步升级的概率较低'
+    ],
+    escalation:[
+      '若成交量持续处于高位、价格同时继续下行，则说明事件影响仍在市场交易中持续体现，需要继续观察',
+      '若「大客户交付延后」等未证实说法在传播中被继续放大、出现新版本',
+      '若大盘与板块情绪同步走弱，则个股可能承受额外的外部拖累'
+    ],
+    watch:[
+      '次日开盘后第一小时的价格与成交量是否偏离常态',
+      '公司是否发布澄清公告或官方说明',
+      '算力板块当日表现：是个股独立异动还是板块共振',
+      '财经新闻对未证实说法的增量传播情况'
+    ]
+  },
+  mid:{
+    label:'未来 1–2 季度',
+    note:'以「盈利兑现」为视角：真正的验证点是「毛利率下修是一次性还是趋势性」以及「收入与订单指引能否兑现」。以下全部为条件式情景，不把未经核实的表述当作事实。',
+    relief:[
+      '若公司按此前表述兑现「维持全年收入指引」，则毛利率下修对全年盈利的影响相对可控',
+      '若三季报实际毛利率落在新的 25%–26% 指引区间内，则该下修更接近保守指引而非持续恶化',
+      '若主要客户后续维持或上调 AI 资本开支，则需求侧可对公司订单形成支持'
+    ],
+    escalation:[
+      '若三季报实际毛利率低于 25%–26% 的新指引，则更可能指向趋势性走弱而非一次性冲击',
+      '若「大客户交付延后」这一未证实说法获公司证实，则收入确认节奏可能后移，短期利润表承压',
+      '若行业整体的资本开支预期在后续下调，则板块与个股的盈利预期可能同时受压'
+    ],
+    watch:[
+      '三季报（预计 10 月底披露）：实际毛利率是否落在新指引区间内',
+      '后续披露中交付节奏与来自大客户订单的表述',
+      '财经新闻与公司披露中，关于未来盈利预期的口径是否出现集中下调（方向比绝对值更重要）',
+      '公司对明年价格策略与成本端的官方表述'
+    ]
+  },
+  long:{
+    label:'长期',
+    note:'以「行业格局与公司长期竞争位置」为视角：单次指引调整不足以单独构成长期结论。',
+    relief:[
+      '若 AI 算力需求在中长期保持扩张趋势，则单次指引调整对赛道长期空间的影响相对有限',
+      '若公司产品结构持续向高毛利方向迁移，则毛利率中枢有回升空间',
+      '若客户结构趋于多元化，则单一客户交付节奏波动对整体的影响会降低'
+    ],
+    escalation:[
+      '若行业从「供不应求」转向价格竞争，则毛利率中枢可能出现系统性下移',
+      '若技术路线发生重大变化或大客户转向自研，则公司产品的议价地位可能被削弱',
+      '若行业资本开支进入下行阶段，则长期成长中枢将承压'
+    ],
+    watch:[
+      '行业与主要客户在资本开支上的前瞻性表述',
+      '公司高毛利业务及新产品收入占比的变化',
+      '毛利率中枢的季度性跟踪',
+      '竞争格局变化的早期信号（新进入者、价格竞争）'
+    ]
+  }
+};
+
+function renderPeriod(pk){
+  ['near','mid','long'].forEach(function(k){
+    document.getElementById('pbtn-'+k).classList.toggle('on', k===pk);
+  });
+  var p = PERIODS[pk];
+  var el = document.getElementById('periodResult');
+  el.innerHTML =
+    '<div class="res-note">'+p.label+'视角：'+p.note+'</div>'+
+    '<div class="res-grid">'+
+      '<div class="col-card yes"><sup class="sup-yes">哪些情况会缓解当前风险 · Scenario</sup>'+
+        '<ul class="cond">'+p.relief.map(function(x){ return '<li>'+x+'</li>'; }).join('')+'</ul></div>'+
+      '<div class="col-card no"><sup class="sup-no">哪些情况会加剧当前风险 · Scenario</sup>'+
+        '<ul class="cond">'+p.escalation.map(function(x){ return '<li>'+x+'</li>'; }).join('')+'</ul></div>'+
+    '</div>'+
+    '<div class="watch-card2"><div class="wh"><span class="bx">W</span>What to Watch · 该周期重点观察</div>'+
+      '<ul class="watch-list">'+p.watch.map(function(w){ return '<li><span class="wdot"></span>'+w+'</li>'; }).join('')+'</ul></div>'+
+    '<div style="margin-top:12px;font-size:11.5px;color:var(--faint);text-align:center">'+
+    '以上为条件式情景：区分「缓解风险」与「加剧风险」，不构成操作建议，也不预测价格走向。';
+  el.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function enterDecision(q){
+  state.q2 = q;
+  var conv = document.getElementById('dsConv');
+  conv.innerHTML = '';
+  var u = document.createElement('div');
+  u.className = 'msg u';
+  u.textContent = q;
+  conv.appendChild(u);
+
+  var m = document.createElement('div');
+  m.className = 'msg a';
+  m.innerHTML = '我明白你的问题。SignalLens <b>不会给出「买」或「卖」的指令</b>，也不会把你的自选股或浏览记录当作「已持仓」来推断你的投资逻辑。'+
+                '我能做的是把 <b>哪些情况会缓解当前风险</b>、<b>哪些情况会加剧当前风险</b>分开列出，并给出对应周期的观察清单。'+
+                '请先选择你关注的时间周期 ↓';
+  conv.appendChild(m);
+
+  var ph = document.getElementById('periodResult');
+  ph.innerHTML = '<div class="placeholder-c">点击上方选择时间周期，SignalLens 将按「风险缓解条件 / 风险升级条件 / What to Watch」给出该周期的观察清单。</div>';
+
+  showScreen('screenDecision');
+}
+
+/* ---------- init ---------- */
+document.addEventListener('DOMContentLoaded', function(){
+  goHome();
+
+  var inp = document.getElementById('askInput');
+  if(inp) inp.addEventListener('keydown', function(e){
+    if(e.key==='Enter'){ e.preventDefault(); startAgent(); }
+  });
+  var mi = document.getElementById('mattersInput');
+  if(mi) mi.addEventListener('keydown', function(e){
+    if(e.key==='Enter'){ e.preventDefault(); sendMattersAsk(); }
+  });
+});
+</script>
+
+
+</body></html>
